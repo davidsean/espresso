@@ -21,6 +21,8 @@ from __future__ import print_function
 import espressomd
 from espressomd import thermostat
 from espressomd import interactions
+from espressomd import polymer
+
 import numpy
 
 # System parameters
@@ -43,8 +45,7 @@ system.non_bonded_inter[0, 0].lennard_jones.set_params(
 fene = interactions.FeneBond(k=10, d_r_max=2)
 system.bonded_inter.add(fene)
 
-poly = system.polymer
-poly(N_P = 1, bond_length = 1.0, MPC=50, bond_id=0)
+poly = polymer.create_polymer(N_P = 1, bond_length = 1.0, MPC=50, bond=fene)
 
 
 #############################################################
