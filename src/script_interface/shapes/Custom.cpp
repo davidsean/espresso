@@ -21,17 +21,32 @@
 
 #include "Custom.hpp"
 
+using std::vector;
+using std::string;
+
+namespace ScriptInterface {
 namespace Shapes {
 
-int Custom::calculate_dist(const double *ppos, double *dist, double *vec) const {
-  int i;
-
-  *dist = -m_d;
-  for (i = 0; i < 3; i++)
-    *dist += ppos[i] * m_n[i];
-
-  for (i = 0; i < 3; i++)
-    vec[i] = m_n[i] * *dist;
-  return 0;
+ParameterMap Custom::valid_parameters() const {
+  return {{"normal", {ParameterType::DOUBLE_VECTOR, 3, true}},
+          {"dist", {ParameterType::DOUBLE, true}}};
 }
+
+VariantMap Custom::get_parameters() const {
+  return {{"normal", m_custom->n()}, {"dist", m_custom->d()}};
+}
+
+
+void Custom::set_parameter(const string &name,
+                         const ScriptInterface::Variant &value) {
+  if (name == "normal") {
+    /* Get the variant as vector, and explicitly construct a Vector3d
+       from that. */
+    m_custom->set_normal(get_value<Vector3d>(value));
+  }
+
+  SET_PARAMETER_HELPER("dist", m_custom->d());
+}
+
 } /* namespace Shapes */
+} /* namespace ScriptInterface */

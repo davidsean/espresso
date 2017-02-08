@@ -19,19 +19,32 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Custom.hpp"
+#ifndef SCRIPT_INTERFACE_SHAPES_CUSTOM_HPP
+#define SCRIPT_INTERFACE_SHAPES_CUSTOM_HPP
 
+#include "Shape.hpp"
+#include "core/shapes/Custom.hpp"
+
+namespace ScriptInterface {
 namespace Shapes {
 
-int Custom::calculate_dist(const double *ppos, double *dist, double *vec) const {
-  int i;
+class Custom : public Shape {
+public:
+  Custom() : m_custom(new ::Shapes::Custom()) {}
 
-  *dist = -m_d;
-  for (i = 0; i < 3; i++)
-    *dist += ppos[i] * m_n[i];
+  const std::string name() const override { return "Shapes::Custom"; }
 
-  for (i = 0; i < 3; i++)
-    vec[i] = m_n[i] * *dist;
-  return 0;
-}
+  ParameterMap valid_parameters() const override;
+  VariantMap get_parameters() const override;
+  void set_parameter(const std::string &name, const Variant &value) override;
+
+  std::shared_ptr<::Shapes::Shape> shape() const override { return m_custom; }
+
+private:
+  std::shared_ptr<::Shapes::Custom> m_custom;
+};
+
 } /* namespace Shapes */
+} /* namespace ScriptInterface */
+
+#endif

@@ -30,12 +30,14 @@
 #include "Rhomboid.hpp"
 #include "Slitpore.hpp"
 #include "Stomatocyte.hpp"
+#include "Custom.hpp"
 
 namespace ScriptInterface {
 namespace Shapes {
 void initialize() {
   ScriptInterface::register_new<ScriptInterface::Shapes::NoWhere>(
       "Shapes::NoWhere");
+  ScriptInterface::register_new<ScriptInterface::Shapes::Custom>("Shapes::Custom");
   ScriptInterface::register_new<ScriptInterface::Shapes::Wall>("Shapes::Wall");
   ScriptInterface::register_new<ScriptInterface::Shapes::Sphere>(
       "Shapes::Sphere");

@@ -21,24 +21,54 @@
 
 #ifndef SHAPES_CUSTOM_HPP
 #define SHAPES_CUSTOM_HPP
+#include <iostream>
 
 #include "Shape.hpp"
 #include "Vector.hpp"
-#include "lb.hpp"
-#include "lbpgu.hpp"
+//#include "core/lb.hpp"
+//#include "core/lbpgu.hpp"  
 
 
 namespace Shapes {
 class Custom : public Shape {
 public:
   Custom() : m_n({1., 0., 0.}), m_d(0.0) {}
+   // printf("out of init\n");
+   // std::cout << "aaa!" << std::endl; 
+   // modding the constructor to set lbfields
+    /*
+    index_t index;
+    int x,y,z;
+    // set lb boundaries to custom field
+    #ifdef LB_BOUNDARIES
+      // ignore halo tweaking because I don't care for now
+      index = 0;
+      for (z = 1; z <= lblattice.grid[2]; z++) {
+        for (y = 1; y<=lblattice.grid[1]; y++) {
+          for (x = 1; x<=lblattice.grid[0]; x++) {
+            if (!lbfields[index].boundary) {
+              lbfields[index].boundary = 0;
+              printf("%f\t%f\t%f\n",x,y,z);
+              ++index; // next node 
+            }
+          }
+        }
+      }
+    #endif // LB_BOUNDARIES
+    */
 
+
+  
+  //int set_lbfields() {
+  //  printf("trying to et fields...\n");
+  //  std::cout << "aaa!" << std::endl;     
+  //}
+  
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;
-
+  
   void set_normal(const Vector3d &normal) {
     m_n = normal;
-
     m_n.normalize();
   }
 
