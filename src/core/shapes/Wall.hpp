@@ -29,8 +29,11 @@ namespace Shapes {
 
 class Point : public Shape {
 public:
-  Point() : m_va({0, 0., 0.}) {}
-  
+  Point() : m_va({0., 0., 0.}) {}
+
+  Point(Vector3d a) {
+   m_va=a;
+   }
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;                   
   Vector3d const &va() const { return m_va; }
@@ -42,10 +45,16 @@ private:
 
 class Segment : public Shape {
 public:
-  Point() : m_va({0, 0., 0.}), m_vb({0, 0., 0.}) {}
-  
+  Segment() : m_va( Point({0., 0., 0.})), m_vb(Point({0., 0., 0.})) {}
+
+  Segment(Point a, Point b) {
+  m_va=a;
+  m_vb=b;
+  }
+
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;
+
   Point const &va() const { return m_va; }
   Point const &vb() const { return m_vb; }
 
@@ -53,42 +62,40 @@ private:
   /** two points defining the segment*/
   Point m_va;
   Point m_vb;
-
 };
 
+
+//} /* namespace Shapes */
+//#endif
+
+
+//namespace Shapes {
+class Wall : public Shape {
+public:
+  Wall() : m_n({1., 0., 0.}), m_d(0.0) {}
+
+  int calculate_dist(const double *ppos, double *dist,
+                     double *vec) const override;
+
+  void set_normal(const Vector3d &normal) {
+    m_n = normal;
+
+    m_n.normalize();
+  }
+
+  Vector3d const &n() const { return m_n; }
+
+  double const &d() const { return m_d; }
+
+  double &d() { return m_d; }
+
+private:
+  /** normal vector on the plane. */
+  Vector3d m_n;
+  /** distance of the wall from the origin. */
+  double m_d;
+};
 
 } /* namespace Shapes */
 
 #endif
-
-
-// namespace Shapes {
-// class Wall : public Shape {
-// public:
-//   Wall() : m_n({1., 0., 0.}), m_d(0.0) {}
-// 
-//   int calculate_dist(const double *ppos, double *dist,
-//                      double *vec) const override;
-// 
-//   void set_normal(const Vector3d &normal) {
-//     m_n = normal;
-// 
-//     m_n.normalize();
-//   }
-// 
-//   Vector3d const &n() const { return m_n; }
-// 
-//   double const &d() const { return m_d; }
-// 
-//   double &d() { return m_d; }
-// 
-// private:
-//   /** normal vector on the plane. */
-//   Vector3d m_n;
-//   /** distance of the wall from the origin. */
-//   double m_d;
-// };
-// 
-// } /* namespace Shapes */
-// 
-// #endif
