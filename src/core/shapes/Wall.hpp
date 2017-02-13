@@ -34,6 +34,12 @@ public:
   Point(Vector3d a) {
    m_va=a;
    }
+ 
+   // overload the index operator  
+   double& operator[] (const int index) {
+    return m_va[index];
+  }
+
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;                   
   Vector3d const &va() const { return m_va; }
@@ -45,23 +51,59 @@ private:
 
 class Segment : public Shape {
 public:
-  Segment() : m_va( Point({0., 0., 0.})), m_vb(Point({0., 0., 0.})) {}
+  Segment() : m_pa( Point({0., 0., 0.})), m_pb(Point({0., 0., 0.})) {}
 
   Segment(Point a, Point b) {
-  m_va=a;
-  m_vb=b;
+  m_pa=a;
+  m_pb=b;
   }
 
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;
 
-  Point const &va() const { return m_va; }
-  Point const &vb() const { return m_vb; }
+  Point const &pa() const { return m_pa; }
+  Point const &pb() const { return m_pb; }
 
 private:
   /** two points defining the segment*/
-  Point m_va;
-  Point m_vb;
+  Point m_pa;
+  Point m_pb;
+};
+
+
+class Triangle : public Shape {
+public:
+//  Triangle() : m_pa( Point({0., 0., 0.})), m_pb(Point({0., 0., 0.})) { }
+  double n[3];
+  Triangle(Point a, Point b, Point c) {
+  m_sa = Segment (a,b);
+  m_sb = Segment (b,c);
+  m_sc = Segment (c,a);
+  
+  // use the cross product ab and bc to find the normal vector
+  m_n = Vector3d( {(a[1]*b[2]-a[2]*b[1]), (a[2]*b[0]-a[0]*b[2]), (a[0]*b[1]-a[1]*b[0])} );
+  //beore we normalize, we can find the distance...
+  m_d = (-m_n[0]*a[0]+m_n[1]*a[1]+m_n[2]*a[2]);
+  m_n.normalize();
+  }
+
+  int calculate_dist(const double *ppos, double *dist,
+                     double *vec) const override;
+
+  Segment const &sa() const { return m_sa; }
+  Segment const &sb() const { return m_sb; }
+  Segment const &sc() const { return m_sc; }
+
+private:
+  /** three segments defining the triangle*/
+  Segment m_sa;
+  Segment m_sb;
+  Segment m_sc;
+
+  // normal vector and distance (like infinite planar wall)
+  Vector3d m_n;
+  double m_d;
+
 };
 
 
