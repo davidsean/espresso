@@ -36,7 +36,7 @@ public:
    }
  
    // overload the index operator  
-   double& operator[] (const int index) {
+   const double& operator[] (const int index) {
     return m_va[index];
   }
 
@@ -44,7 +44,7 @@ public:
                      double *vec) const override;                   
   Vector3d const &va() const { return m_va; }
 private:
-  /** two points defining the segment*/
+  /** vector defining the point*/
   Vector3d m_va;
 };
 
@@ -93,6 +93,11 @@ public:
   Segment const &sa() const { return m_sa; }
   Segment const &sb() const { return m_sb; }
   Segment const &sc() const { return m_sc; }
+
+  //Segment const &pa() const { return m_sa.pa(); }
+  //Segment const &pb() const { return m_sb.pa(); }
+  //Segment const &pc() const { return m_sc.pa(); }
+
 
 private:
   /** three segments defining the triangle*/
