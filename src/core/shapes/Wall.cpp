@@ -54,55 +54,51 @@ int Segment::calculate_dist(const double *ppos, double *dist, double *vec) const
   m_pa.calculate_dist(ppos, &d_a, v_ap);
   m_pb.calculate_dist(ppos, &d_b, v_bp);
  
-// we now have three vectors,
+// we now have three options,
 // either: 
 // 1) ppos is closer to Point va
 // 2) ppos is closer to Point vb
 // 3) ppos is closer to a point on the lines bettween va and vb
-// for find this, we need to check the normalized dot products
+// for find this, we need to check the dot products
 
 double dot_a = 0;
 double dot_b = 0;
   for (i = 0; i<3; i++) {
- //   v_ba[i] = m_vb.m_va[i] - m_va.m_va[i];
     dot_a += v_ap[i]*v_ba[i];
     dot_b += v_bp[i]*v_ba[i];
   }
 
 // if both are negative, pt is closer to b
 if (dot_a<0 && dot_b<0) {
-  //printf("closer to b: %.2f\n", d_b);
   for (i = 0; i<3; i++) {
     vec[i]=v_ap[i];
   }
   *dist=d_b;
-  //printf("%.2f %.2f %.2f = %.2f\n", vec[0], vec[1], vec[2], *dist);
   return 0;
 
 // if both are positive, pt is closer to a
 } else if ( dot_a>0 && dot_b>0) {
-  //printf("closer to a: %.2f\n",d_a);
   for (i = 0; i<3; i++) {
     vec[i]=v_bp[i];
   }
   *dist=d_a;
-  //printf("%.2f %.2f %.2f = %.2f\n", vec[0], vec[1], vec[2], *dist);
   return 0;
 }
-//then, find the distance to line
+// else, the pt is closer to the line,
+// find the distance to line
 else {
   d_ba=0;
   dot=0;
- 
   for (i = 0; i<3; i++) {
     dot += v_ap[i]*v_ba[i];
     d_ba += SQR(v_ba[i]);
   }
   dot=SQR(dot);
-  d_line=sqrt(SQR(d_a)-dot/d_ba);  
-  //printf("closer to line: %.2f \n",d_line);
- 
+  d_line=sqrt(SQR(d_a)-dot/d_ba);   
   *dist=d_line;
+  
+  // we have the distance, but we will need the vector
+  // there is probably a faster way, but this works.
   double norm_a=0;
   double norm_b=0;
 
@@ -116,10 +112,25 @@ else {
     v_ap[i]*=norm_a;
     v_bp[i]*=norm_b;
   }
-
+  
+  // add up the two vectors to find twice the distance
   for (i = 0; i < 3; i++)
     vec[i]=0.5*(v_ap[i]+v_bp[i])*(d_line);
-  //printf("%.2f %.2f %.2f = %.2f\n", vec[0], vec[1], vec[2], *dist);
+  printf("| %f, %f, %f| = %f", vec[0],vec[1],vec[2],*dist);
+  
+  // simple method, make sure results are the same
+  m_pa.calculate_dist(ppos, &d_a, v_ap);
+  m_pb.calculate_dist(ppos, &d_b, v_bp);
+  *dist=0;
+  // add up the two vectors to find twice the distance
+  for (i = 0; i < 3; i++)
+    vec[i]=0.5*(v_ap[i]+v_bp[i]);
+    *dist+=SQR(vec[i]);
+  *dist=sqrt(*dist);  
+  printf("| %f, %f, %f| = %f", vec[0],vec[1],vec[2],*dist);
+
+    
+    
   return 0;
 }
 
