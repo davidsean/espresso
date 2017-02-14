@@ -146,45 +146,61 @@ int Triangle::calculate_dist(const double *ppos, double *dist, double *vec) cons
   double sc02=0;
   double sc11=0;
   double sc12=0;
-  double u[3],v[3];
+  double u,v;
   double a[3];
 
 
 // get some temp vectors
   for (i = 0; i < 3; i++) {
-    t_0[i] = m_sc.pa()[i] - m_ma.pa()[i];
-    t_1[i] = m_sb.pa()[i] - m_sa.pa()[i];
+  //  t_0[i] = m_sc.pa()[i] - m_ma.pa()[i];
+  //  t_1[i] = m_sb.pa()[i] - m_sa.pa()[i];
+    t_0[i] = 1;
+    t_1[i] = 1;
     sc00 += SQR(t_0[i]);
-    sc01 += t_0[i]*t_i[i];
+    sc01 += t_0[i]*t_1[i];
     sc02 += t_0[i]*v_a[i];
     sc11 += SQR(t_1[i]);
     sc12 += t_1[i]*v_a[i];
   }
-  norm=1./(sc00*sc11 - SQR(sc01));
+  double norm=1./(sc00*sc11 - SQR(sc01));
   u = (sc11*sc02 - sc01*sc12)*norm;
-  v = (sc00*sc12 - sc01*sc20)*norm;
-  if (u>=0) && (v>=0) && (u+v<1) {
-  // find the minimum distance to the surface
-  d_f = -m_d;
-  for (i = 0; i < 3; i++)
+  v = (sc00*sc12 - sc01*sc02)*norm;
+  //if ( (u>=0) && (v>=0) && (u+v<1)) {
+  if (0) {
+    // find the minimum distance to the surface
+    d_f = -m_d;
+    for (i = 0; i < 3; i++)
     d_f += ppos[i] * m_n[i];
-  *dist=d_f;
-  vec=m_n;
-  return 0;
+    *dist=d_f;
+    vec[0]=m_n[0];
+    vec[1]=m_n[1];
+    vec[2]=m_n[2];
+    //hack!
+    *dist=0;
+    vec[0]=0;
+    vec[1]=0;
+    vec[2]=0;
+    return 0;
   } else if (d_a<=d_b && d_a<=d_c) {
-  *dist=d_a;
-  vec=v_a;
-  return 0;
+    *dist=d_a;
+    vec=v_a;
+    return 0;
   } else if (d_b<=d_a && d_b<=d_c) {
-  *dist=d_a;
-  vec=v_a;
-  return 0;
-  } else if (d_c<=a && d_c<=d_b) {
-  *dist=d_c;
-  vec=v_c;
-  return 0;
+    *dist=d_a;
+    vec=v_a;
+    return 0;
+  } else if (d_c<=d_a && d_c<=d_b) {
+    *dist=d_c;
+    vec=v_c;
+    return 0;
   } else {
-  printf("Not sure!");
+    printf("Not sure!");
+    //hack!
+    *dist=0;
+    vec[0]=0;
+    vec[1]=0;
+    vec[2]=0;
+    return 0;
   }
  
 // I can do better, but let's worry about performance at some later time...
@@ -201,20 +217,23 @@ int Wall::calculate_dist(const double *ppos, double *dist, double *vec) const {
   //printf("part is %f %f %f \n", ppos[0], ppos[1], ppos[2]);  
   
   // create a Point at 1 0 0  
-  Point p1 = Point({5.000010, 1.00001, 0.0});
+  Point p1 = Point({1.000010, 0.00001, 0.0});
   //p1.calculate_dist(ppos, &d, d_v);
   //printf("pt1 is %f %f %f \t d:%f\n", d_v[0], d_v[1], d_v[2], d);
   
   // create a Point at 10 0 0  
-  Point p2 = Point({10.00001, 3.00001, 0.0});
+  Point p2 = Point({5.00001, 3.00001, 0.0});
   //p2.calculate_dist(ppos, &d, d_v);
   //printf("pt2 is %f %f %f \t d:%f\n", d_v[0], d_v[1], d_v[2], d);
  
-  Segment s1 = Segment(p1,p2);
+  Point p3 = Point({1.00001, 5.00001, 0.0});
+  //Segment s1 = Segment(p1,p2);
   //s1.calculate_dist(ppos,&d, d_v);
   //printf("s1 is %f %f %f \t d:%f\n", d_v[0], d_v[1], d_v[2], d);
  
-  s1.calculate_dist(ppos,dist, vec);
+  //s1.calculate_dist(ppos,dist, vec);
+  Triangle t1 = Triangle(p1,p2,p3);
+  t1.calculate_dist(ppos,dist, vec);
   //printf("s1 is %f %f %f \t d:%f\n", vec[0], vec[1], vec[2], *dist);
   return 0;
 /*
