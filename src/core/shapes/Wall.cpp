@@ -71,7 +71,7 @@ double dot_b = 0;
 // if both are negative, pt is closer to b
 if (dot_a<0 && dot_b<0) {
   for (i = 0; i<3; i++) {
-    vec[i]=v_ap[i];
+    vec[i]=v_bp[i];
   }
   *dist=d_b;
   return 0;
@@ -79,7 +79,7 @@ if (dot_a<0 && dot_b<0) {
 // if both are positive, pt is closer to a
 } else if ( dot_a>0 && dot_b>0) {
   for (i = 0; i<3; i++) {
-    vec[i]=v_bp[i];
+    vec[i]=v_ap[i];
   }
   *dist=d_a;
   return 0;
@@ -87,50 +87,21 @@ if (dot_a<0 && dot_b<0) {
 // else, the pt is closer to the line,
 // find the distance to line
 else {
-  d_ba=0;
-  dot=0;
+  double dot=0;
   for (i = 0; i<3; i++) {
-    dot += v_ap[i]*v_ba[i];
-    d_ba += SQR(v_ba[i]);
+    // normalize the line vector
+    v_ba[i] /= d_ba;
+    //find the projection
+    dot += v_ap[i]*(-1.*v_ba[i]);
   }
-  dot=SQR(dot);
-  d_line=sqrt(SQR(d_a)-dot/d_ba);   
-  *dist=d_line;
-  
-  // we have the distance, but we will need the vector
-  // there is probably a faster way, but this works.
-  double norm_a=0;
-  double norm_b=0;
-
-  for (i = 0; i < 3; i++) {
-    norm_a+=SQR(v_ap[i]);
-    norm_b+=SQR(v_bp[i]);
-  }
-  norm_a=1./sqrt(norm_a); 
-  norm_b=1./sqrt(norm_b); 
-  for (i = 0; i < 3; i++) {
-    v_ap[i]*=norm_a;
-    v_bp[i]*=norm_b;
-  }
-  
-  // add up the two vectors to find twice the distance
-  for (i = 0; i < 3; i++)
-    vec[i]=0.5*(v_ap[i]+v_bp[i])*(d_line);
-  printf("| %f, %f, %f| = %f", vec[0],vec[1],vec[2],*dist);
-  
-  // simple method, make sure results are the same
-  m_pa.calculate_dist(ppos, &d_a, v_ap);
-  m_pb.calculate_dist(ppos, &d_b, v_bp);
+  printf("dot: %f\n",dot);
   *dist=0;
-  // add up the two vectors to find twice the distance
-  for (i = 0; i < 3; i++)
-    vec[i]=0.5*(v_ap[i]+v_bp[i]);
+  for (i = 0; i<3; i++) {
+    // remove the projection and we have distance vector
+    vec[i] = v_ap[i] + (dot*v_ba[i])  ;
     *dist+=SQR(vec[i]);
-  *dist=sqrt(*dist);  
-  printf("| %f, %f, %f| = %f", vec[0],vec[1],vec[2],*dist);
-
-    
-    
+  }
+  *dist=sqrt(*dist);
   return 0;
 }
 
@@ -139,83 +110,48 @@ else {
 
 int Triangle::calculate_dist(const double *ppos, double *dist, double *vec) const {
   int i;
-  double d_a, d_b, d_c, d_f;
-  double v_a[3], v_b[3], v_c[3];
+  double d_sa, d_sb, d_sc;
+  double v_sa[3], v_sb[3], v_sc[3];
+  double d_pa=0;
+  double d_pb=0;
+  double d_pc=0;
 
  // if ppos[0]-
   //find distances to the segments
-  m_sa.calculate_dist(ppos, &d_a,v_a);
-  m_sb.calculate_dist(ppos, &d_b,v_b);
-  m_sc.calculate_dist(ppos, &d_c,v_c);
-
-  // testing this method: http://blackpawn.com/texts/pointinpoly/
-  double t_0[3];
-  double t_1[3];
-  double t_2[3];
-  double sc00=0;
-  double sc01=0;
-  double sc02=0;
-  double sc11=0;
-  double sc12=0;
-  double u,v;
-  double a[3];
-
-
-// get some temp vectors
+  m_sa.calculate_dist(ppos, &d_sa,v_sa);
+  m_sb.calculate_dist(ppos, &d_sb,v_sb);
+  m_sc.calculate_dist(ppos, &d_sc,v_sc);
+  
+  // see if the projection of the pt is "on" the triangular surface:
+  // if the pt is closer to all segments than all corners.
   for (i = 0; i < 3; i++) {
-  //  t_0[i] = m_sc.pa()[i] - m_ma.pa()[i];
-  //  t_1[i] = m_sb.pa()[i] - m_sa.pa()[i];
-    t_0[i] = 1;
-    t_1[i] = 1;
-    sc00 += SQR(t_0[i]);
-    sc01 += t_0[i]*t_1[i];
-    sc02 += t_0[i]*v_a[i];
-    sc11 += SQR(t_1[i]);
-    sc12 += t_1[i]*v_a[i];
+    d_pa=SQR(ppos[i]- m_pa.va()[i]);
+    d_pb=SQR(ppos[i]- m_pb.va()[i]);
+    d_pc=SQR(ppos[i]- m_pc.va()[i]);
   }
-  double norm=1./(sc00*sc11 - SQR(sc01));
-  u = (sc11*sc02 - sc01*sc12)*norm;
-  v = (sc00*sc12 - sc01*sc02)*norm;
-  //if ( (u>=0) && (v>=0) && (u+v<1)) {
-  if (0) {
-    // find the minimum distance to the surface
-    d_f = -m_d;
+  
+  // if any segment distances return the point values it is outside
+  if (! (d_pa==SQR(d_sa) || d_pb==SQR(d_sb) || d_pc==SQR(d_sc) )) {
+    *dist = -m_d;
     for (i = 0; i < 3; i++)
-    d_f += ppos[i] * m_n[i];
-    *dist=d_f;
-    vec[0]=m_n[0];
-    vec[1]=m_n[1];
-    vec[2]=m_n[2];
-    //hack!
-    *dist=0;
-    vec[0]=0;
-    vec[1]=0;
-    vec[2]=0;
+      *dist += ppos[i] * m_n[i];
+    for (i = 0; i < 3; i++)
+      vec[i] = m_n[i] * *dist;
     return 0;
-  } else if (d_a<=d_b && d_a<=d_c) {
-    *dist=d_a;
-    vec=v_a;
+  // if outside the planar triangle, find the closest segment
+  } else if (d_sa<=d_sb && d_sa<=d_sc) {
+    *dist=d_sa;
+    vec=v_sa;
     return 0;
-  } else if (d_b<=d_a && d_b<=d_c) {
-    *dist=d_a;
-    vec=v_a;
+  } else if (d_sb<=d_sa && d_sb<=d_sc) {
+    *dist=d_sa;
+    vec=v_sa;
     return 0;
-  } else if (d_c<=d_a && d_c<=d_b) {
-    *dist=d_c;
-    vec=v_c;
+  } else if (d_sc<=d_sa && d_sc<=d_sb) {
+    *dist=d_sc;
+    vec=v_sc;
     return 0;
-  } else {
-    printf("Not sure!");
-    //hack!
-    *dist=0;
-    vec[0]=0;
-    vec[1]=0;
-    vec[2]=0;
-    return 0;
-  }
- 
-// I can do better, but let's worry about performance at some later time...
- 
+  } 
   return 1;
 }
 
@@ -228,24 +164,36 @@ int Wall::calculate_dist(const double *ppos, double *dist, double *vec) const {
   //printf("part is %f %f %f \n", ppos[0], ppos[1], ppos[2]);  
   
   // create a Point at 1 0 0  
-  Point p1 = Point({1.000010, 0.00001, 0.0});
+  Point p1 = Point({1.0000, 0.000, 0.0});
   //p1.calculate_dist(ppos, &d, d_v);
   //printf("pt1 is %f %f %f \t d:%f\n", d_v[0], d_v[1], d_v[2], d);
   
   // create a Point at 10 0 0  
-  Point p2 = Point({5.00001, 3.00001, 0.0});
+  Point p2 = Point({1.00, 5.000, 0.0});
   //p2.calculate_dist(ppos, &d, d_v);
   //printf("pt2 is %f %f %f \t d:%f\n", d_v[0], d_v[1], d_v[2], d);
  
-  Point p3 = Point({1.00001, 5.00001, 0.0});
   //Segment s1 = Segment(p1,p2);
-  //s1.calculate_dist(ppos,&d, d_v);
+  //s1.calculate_dist(ppos, &d, d_v);
   //printf("s1 is %f %f %f \t d:%f\n", d_v[0], d_v[1], d_v[2], d);
+ 
+  Point p3 = Point({5.0, 7.0, 0.0});
+  //p3.calculate_dist(ppos, &d, d_v);
+
+    
  
   //s1.calculate_dist(ppos,dist, vec);
   Triangle t1 = Triangle(p1,p2,p3);
-  t1.calculate_dist(ppos,dist, vec);
+  t1.calculate_dist(ppos, &d, d_v);
+  
+  for (i = 0; i < 3; i++)
+    vec[i]=d_v[i];
+  *dist=d;
   //printf("s1 is %f %f %f \t d:%f\n", vec[0], vec[1], vec[2], *dist);
+
+  for (i = 0; i < 3; i++)
+    vec[i]=d_v[i];
+  *dist=d;
   return 0;
 /*
   *dist = -m_d;

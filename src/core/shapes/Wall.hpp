@@ -79,6 +79,9 @@ public:
   m_sa = Segment (a,b);
   m_sb = Segment (b,c);
   m_sc = Segment (c,a);
+  m_pa = a;
+  m_pb = b;
+  m_pc = c;
   
   // use the cross product ab and bc to find the normal vector
   m_n = Vector3d( {(a[1]*b[2]-a[2]*b[1]), (a[2]*b[0]-a[0]*b[2]), (a[0]*b[1]-a[1]*b[0])} );
@@ -94,9 +97,9 @@ public:
   Segment const &sb() const { return m_sb; }
   Segment const &sc() const { return m_sc; }
 
-  //Segment const &pa() const { return m_sa.pa(); }
-  //Segment const &pb() const { return m_sb.pa(); }
-  //Segment const &pc() const { return m_sc.pa(); }
+  Point const &pa() const { return m_pa; }
+  Point const &pb() const { return m_pb; }
+  Point const &pc() const { return m_pc; }
 
 
 private:
@@ -105,6 +108,9 @@ private:
   Segment m_sb;
   Segment m_sc;
 
+  Point m_pa;
+  Point m_pb;
+  Point m_pc;
   // normal vector and distance (like infinite planar wall)
   Vector3d m_n;
   double m_d;
