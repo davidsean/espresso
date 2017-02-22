@@ -204,7 +204,18 @@ int Wall::calculate_dist(const double *ppos, double *dist, double *vec) const {
   for (i = 0; i < 3; i++)
     vec[i]=d_v[i];
   *dist=d;
-  return 0;
+
+/*
+   *dist = -m_d;
+   for (i = 0; i < 3; i++)
+     *dist += ppos[i] * m_n[i];
+ 
+   for (i = 0; i < 3; i++)
+     vec[i] = m_n[i] * *dist;
+     
+*/
+   return 0;
+
 
 }
 
