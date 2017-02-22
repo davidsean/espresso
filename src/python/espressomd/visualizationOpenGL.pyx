@@ -215,13 +215,11 @@ class openGLLive:
 
         #TODO: get shapes from lbboundaries
         for s in coll_shape_obj['Shapes::Wall']:
-            #d = s[0].get_parameter('dist')
-            #n = s[0].get_parameter('normal')
-            #edges = self.edgesFromPN(d*np.array(n),n,2*box_diag)
-            #self.shapes['Shapes::Wall'].append([edges,s[1]])
-            self.shapes['Shapes::Wall'].append([self.rasterizeBruteForce(s[0]), s[1]])
-
-
+            d = s[0].get_parameter('dist')
+            n = s[0].get_parameter('normal')
+            edges = self.edgesFromPN(d*np.array(n),n,2*box_diag)
+            self.shapes['Shapes::Wall'].append([edges,s[1]])
+        
         for s in coll_shape_obj['Shapes::Cylinder']:
             pos = np.array(s[0].get_parameter('center'))
             a = np.array(s[0].get_parameter('axis'))
