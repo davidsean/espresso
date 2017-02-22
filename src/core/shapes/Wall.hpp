@@ -83,8 +83,9 @@ public:
   m_pb = b;
   m_pc = c;
   
+  // TODO: verify this works
   // use the cross product ab and bc to find the normal vector
-  m_n = Vector3d( {(a[1]*b[2]-a[2]*b[1]), (a[2]*b[0]-a[0]*b[2]), (a[0]*b[1]-a[1]*b[0])} );
+  m_n = Vector3d( {((a[1]-b[1])*(b[2]-c[2])-(a[2]-b[2])*(b[1]-c[1])), ((a[2]-b[2])*(b[0]-c[0])-(a[0]-b[0])*(b[2]-c[2])), ((a[0]-b[0])*(b[1]-c[1])-(a[1]-b[1])*(b[0]-c[0]))} );
   //beore we normalize, we can find the distance...
   m_d = (-m_n[0]*a[0]+m_n[1]*a[1]+m_n[2]*a[2]);
   m_n.normalize();
