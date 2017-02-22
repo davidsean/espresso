@@ -113,30 +113,29 @@ int Triangle::calculate_dist(const double *ppos, double *dist, double *vec) cons
   double t_0[3];
   double t_1[3];
   double t_2[3];
-  double sc00=0;
-  double sc01=0;
-  double sc02=0;
-  double sc11=0;
-  double sc12=0;
+  double dot00=0;
+  double dot01=0;
+  double dot02=0;
+  double dot11=0;
+  double dot12=0;
   double u,v;
   double a[3];
 
-
 // get some temp vectors
   for (i = 0; i < 3; i++) {
-    t_0[i] = m_pc.va()[i] - m_pb.va()[i];
+    t_0[i] = m_pc.va()[i] - m_pa.va()[i];
     t_1[i] = m_pb.va()[i] - m_pa.va()[i];
-    t_2[i] = 0.;
-    sc00 += SQR(t_0[i]);
-    sc01 += t_0[i]*t_1[i];
-    sc02 += t_0[i]*t_2[i];
-    sc11 += SQR(t_1[i]);
-    sc12 += t_1[i]*t_2[i];
+    t_2[i] = ppos[i] - m_pa.va()[i];
+    dot00 += SQR(t_0[i]);
+    dot01 += t_0[i]*t_1[i];
+    dot02 += t_0[i]*t_2[i];
+    dot11 += SQR(t_1[i]);
+    dot12 += t_1[i]*t_2[i];
   }
-  double norm=1./(sc00*sc11 - SQR(sc01));
-  u = (sc11*sc02 - sc01*sc12)*norm;
-  v = (sc00*sc12 - sc01*sc02)*norm;
-  if ( (u>=0) && (v>=0) && (u+v<1) && 0) {
+  double norm=1./(dot00*dot11 - SQR(dot01));
+  u = (dot11*dot02 - dot01*dot12)*norm;
+  v = (dot00*dot12 - dot01*dot02)*norm;
+  if ((u>=0) && (v>=0) && (u+v<1)) {
     // find the minimum distance to the surface
     *dist = -m_d;
     for (i = 0; i < 3; i++)
@@ -144,8 +143,6 @@ int Triangle::calculate_dist(const double *ppos, double *dist, double *vec) cons
     vec[0]=m_n[0];
     vec[1]=m_n[1];
     vec[2]=m_n[2];
-    //hack!
-    *dist=0.96;
     return 0;
   }
  
