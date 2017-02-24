@@ -113,6 +113,17 @@ public:
       m_pc[i] = c[i];
     }
   }
+  
+Square(Point a, Point b, Point c) {
+    int i = 0;
+    // can pre-calculate some dot products here if needed...
+    for (i; i<3; i++) {
+      m_va[i] = a[i] - c[i];
+      m_vb[i] = b[i] - c[i];
+      m_pc[i] = c[i];
+    }
+  }
+
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;
  
@@ -125,8 +136,23 @@ private:
 };
 
 
-//} /* namespace Shapes */
-//#endif
+
+class Voxel : public Shape {
+public:
+  Square(Vector3d a, float l) {  
+      m_va=a;
+      m_l=l
+  }
+
+  int calculate_dist(const double *ppos, double *dist,
+                     double *vec) const override; 
+private:
+  /** position of the corner origin A*/
+  Vector3d m_va;
+  /** voxel lattive length*/
+  double m_l;
+};
+
 
 
 //namespace Shapes {

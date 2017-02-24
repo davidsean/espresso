@@ -176,18 +176,135 @@ int Triangle::calculate_dist(const double *ppos, double *dist, double *vec) cons
 
 
 
+int Square::calculate_dist(const double *ppos, double *dist, double *vec) const {
+  int i;
+  
+  Vector3d t_0=m_va;  
+  Vector3d t_1=m_vb;
+  Vector3d t_2;
+  for (i = 0; i < 3; i++) {
+    t_2[i] = ppos[i] - m_pc[i];
+  }
+  // I may want to pre-calculate some of these to keep in the Triangle class
+  double dot00 = t_0.dot(t_0); // can precalculate this one
+  double dot01 = t_0.dot(t_1); // can precalculate this one
+  double dot02 = t_0.dot(t_2);
+  double dot11 = t_1.dot(t_1); // can precalculate this one
+  double dot12 = t_1.dot(t_2);
+
+  double norm=1./(dot00*dot11 - SQR(dot01)); // can precalculate this one
+  double u = (dot11*dot02 - dot01*dot12)*norm;
+  double v = (dot00*dot12 - dot01*dot02)*norm;
+  if ((u>=0) && (v>=0) && (u<=1) && (v<=1)) {
+    // The triangualr surface is the target
+    // find the norm 
+    Vector3d n;
+    n.cross(t_1,t_0,n); // can precalculate this one
+    //beore we normalize, we can find the distance...
+    *dist = (n.dot(m_pc)); 
+    n.normalize();
+    for (i = 0; i < 3; i++)
+      *dist += ppos[i] * n[i];
+    for (i = 0; i < 3; i++)
+      vec[i] = n[i] * (*dist);
+    return 0;
+  } else if ((u>=1) && (v<=1) && (v>=0)) {
+  // the edge  AD is the target
+    Vector3d a,d;
+    for (i = 0; i < 3; i++) {
+      d[i] = m_pc[i] + m_va[i] + m_vb[i];
+      a[i] = m_pc[i] + m_va[i];
+    }
+    Segment s_ad = Segment(a,d);
+    s_ad.calculate_dist(ppos,dist,vec);
+    //*dist=0.955;
+    return 0; 
+} else if ((u>=0) && (v>=0) ) {
+  // the edge  DB is the target
+    Vector3d d,b;
+    for (i = 0; i < 3; i++) {
+      d[i] = m_pc[i] + m_va[i] + m_vb[i];
+      b[i] = m_pc[i] + m_vb[i];
+    }
+    Segment s_db = Segment(d,b);
+    s_db.calculate_dist(ppos,dist,vec);
+    //*dist=0.970;
+    return 0;
+} else if ((u<=0) && (v>=0)) {
+  // the edge  CB is the target
+    Vector3d d;
+    for (i = 0; i < 3; i++) {
+      d[i] = m_pc[i] + m_vb[i];
+    }
+    Segment s_cb = Segment(m_pc,d);
+    s_cb.calculate_dist(ppos,dist,vec);
+    //*dist=0.955;
+    return 0; 
+} else if ((v<=0)) {
+  // the edge  CA is the target
+    Vector3d a;
+    for (i = 0; i < 3; i++) {
+      a[i] = m_pc[i] + m_va[i];
+    }
+    Segment s_ca = Segment(m_pc,a);
+    s_ca.calculate_dist(ppos,dist,vec);
+    //*dist=0.955;
+    return 0; 
+ } else {
+     printf("error, did not find correct target");
+     return 1;
+  }
+}
+
+
+
+int Voxel::calculate_dist(const double *ppos, double *dist, double *vec) const {
+  int i,i_min;
+  double dx,dy,dz;
+  double dx2,dy2,dz2;
+  
+  double delta[3];
+  double delta2[3];
+  
+  for i in range(3){
+    delta[i] = m_va[i]-ppos[i];
+    delta2[i] = SQR(delta[i]);
+
+  i_min=0;
+  for i in range(3){
+      if (delta[i]<delta[i_min])
+          i_min=i;
+  }
+
+  //if pt is inside the voxel
+  if (delta2<SQR((0.5*m_l))) {
+      // part is inside voxel
+      // the closest wall is
+      
+      m_va
+  }
+
+      
+  }
+    calculate_dist
+    return 0;
+
+  Square face = Square()
+}
+
+
 int Wall::calculate_dist(const double *ppos, double *dist, double *vec) const {
   int i;
   double d_v[3];
   double d=0;
 
   // create a Point at 1 0 0  
-  Point p1 = Point({2.0000, 1.000, 0.0});
+  Point p1 = Point({2.00, 2.0, 0.0});
   //p1.calculate_dist(ppos, &d, d_v);
   //printf("pt1 is %f %f %f \t d:%f\n", d_v[0], d_v[1], d_v[2], d);
   
   // create a Point at 10 0 0  
-  Point p2 = Point({8.00, 2.000, 0.0});
+  Point p2 = Point({8.0, 8.0, 0.0});
   //p2.calculate_dist(ppos, &d, d_v);
   //printf("pt2 is %f %f %f \t d:%f\n", d_v[0], d_v[1], d_v[2], d);
  
@@ -195,12 +312,12 @@ int Wall::calculate_dist(const double *ppos, double *dist, double *vec) const {
   //s1.calculate_dist(ppos, &d, d_v);
   //printf("s1 is %f %f %f \t d:%f\n", d_v[0], d_v[1], d_v[2], d);
  
-  Point p3 = Point({3.0, 8.0, 0.0});
+  Point p3 = Point({2.0, 8.1, 0.0});
   //p3.calculate_dist(ppos, &d, d_v);
 
     
-  Triangle t1 = Triangle(p1,p2,p3);
-  t1.calculate_dist(ppos, &d, d_v);
+  Square S1 = Square(p1,p2,p3);
+  S1.calculate_dist(ppos, &d, d_v);
   
   for (i = 0; i < 3; i++)
     vec[i]=d_v[i];

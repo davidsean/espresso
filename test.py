@@ -73,14 +73,14 @@ def main():
         visualizer.update()
 
 #Start simulation in seperate thread
-t = Thread(target=main)
-t.daemon = True
-t.start()
+#t = Thread(target=main)
+#t.daemon = True
+#t.start()
 
-visualizer.update()
-visualizer.start()
+#visualizer.update()
+#visualizer.start()
 
-exit()
+#exit()
 
 z=0.1
 fp=open('phiTriangle.dat', 'w')
