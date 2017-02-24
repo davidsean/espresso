@@ -125,20 +125,20 @@ public:
   Triangle2(Vector3d a, Vector3d b, Vector3d c) {  
     int i = 0;
     for (i; i<3; i++) {
-      m_va[i]=c[i]-a[i];
-      m_vb[i]=c[i]-b[i];
+      m_va[i] = a[i] - c[i];
+      m_vb[i] = b[i] - c[i];
+      m_pc[i] = c[i];
     }
-    m_pc=c;
   }
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;
 
+ 
 private:
   /** two vectors defining the triangle ( C to A and C to B */
   Vector3d m_va;
   Vector3d m_vb;
   Vector3d m_pc;
-
 };
 
 

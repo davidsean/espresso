@@ -107,6 +107,70 @@ else {
 }
 
 
+
+
+int Triangle2::calculate_dist(const double *ppos, double *dist, double *vec) const {
+  int i;
+  
+  Vector3d t_0=m_va;  
+  Vector3d t_1=m_vb;
+  Vector3d t_2;
+  for (i = 0; i < 3; i++) {
+    t_2[i] = ppos[i] - m_pc[i];
+  }
+  dot00 = t_0.dot(t_0);
+  dot01 = t_0.dot(t_1);
+  dot02 = t_0.dot(t_2);
+  dot11 = t_1.dot(t_1); 
+  dot12 = t_1.dot(t_2);
+
+  double norm=1./(dot00*dot11 - SQR(dot01));
+  u = (dot11*dot02 - dot01*dot12)*norm;
+  v = (dot00*dot12 - dot01*dot02)*norm;
+  if ((u>=0) && (v>=0) && (u+v<1)) {
+    // The triangualr surface is the target
+    // find the norm 
+    Vector3d n =t_0.cross(t_1);
+    //beore we normalize, we can find the distance...
+    *dist = (n.dot(m_pc));
+    n.normalize();
+    for (i = 0; i < 3; i++)
+      *dist += ppos[i] * n[i];
+    for (i = 0; i < 3; i++)
+      vec[i] = n[i] * (*dist);
+    return 0;
+  } elseif ((u>=0) && (v>=0)) {
+  // the edge  AB is the target
+    Point a,b;
+    for (i = 0; i < 3; i++)
+      a[i] = m_pc[i] +m_va[i];
+      b[i] = m_pc[i] +m_vb[i];
+    s_ab = Segment(a,b);
+    s_ab.calculate_dist(ppos,dist,vec);
+    return 0;
+  } elseif ((u<=0) && (v>=0)) {
+  // the edge  CB is the target
+    Point b;
+    for (i = 0; i < 3; i++)
+      b[i] = m_pc[i] +m_vb[i];
+    s_cb = Segment(m_pc,b);
+    s_cb.calculate_dist(ppos,dist,vec);
+    return 0;
+  } elseif ((v<=0) ) {
+  // the edge  AC is the target
+    Point a;
+    for (i = 0; i < 3; i++)
+      a[i] = m_pc[i] +m_vb[i];
+    s_ac = Segment(m_pc,a);
+    s_ac.calculate_dist(ppos,dist,vec);
+    return 0;
+  } else {
+     printf("error, did not find correct target");
+     return 1;
+  }
+}
+
+
 int Triangle::calculate_dist(const double *ppos, double *dist, double *vec) const {
   int i;
   // testing this method: http://blackpawn.com/texts/pointinpoly/
@@ -198,7 +262,7 @@ int Wall::calculate_dist(const double *ppos, double *dist, double *vec) const {
   //p3.calculate_dist(ppos, &d, d_v);
 
     
-  Triangle t1 = Triangle(p1,p2,p3);
+  Triangle2 t1 = Triangle2(p1,p2,p3);
   t1.calculate_dist(ppos, &d, d_v);
   
   for (i = 0; i < 3; i++)
