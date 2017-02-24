@@ -109,7 +109,7 @@ else {
 
 
 
-int Triangle2::calculate_dist(const double *ppos, double *dist, double *vec) const {
+int Triangle::calculate_dist(const double *ppos, double *dist, double *vec) const {
   int i;
   
   Vector3d t_0=m_va;  
@@ -118,50 +118,54 @@ int Triangle2::calculate_dist(const double *ppos, double *dist, double *vec) con
   for (i = 0; i < 3; i++) {
     t_2[i] = ppos[i] - m_pc[i];
   }
-  dot00 = t_0.dot(t_0);
-  dot01 = t_0.dot(t_1);
-  dot02 = t_0.dot(t_2);
-  dot11 = t_1.dot(t_1); 
-  dot12 = t_1.dot(t_2);
+  // I may want to pre-calculate some of these to keep in the Triangle class
+  double dot00 = t_0.dot(t_0); // can precalculate this one
+  double dot01 = t_0.dot(t_1); // can precalculate this one
+  double dot02 = t_0.dot(t_2);
+  double dot11 = t_1.dot(t_1); // can precalculate this one
+  double dot12 = t_1.dot(t_2);
 
-  double norm=1./(dot00*dot11 - SQR(dot01));
-  u = (dot11*dot02 - dot01*dot12)*norm;
-  v = (dot00*dot12 - dot01*dot02)*norm;
+  double norm=1./(dot00*dot11 - SQR(dot01)); // can precalculate this one
+  double u = (dot11*dot02 - dot01*dot12)*norm;
+  double v = (dot00*dot12 - dot01*dot02)*norm;
   if ((u>=0) && (v>=0) && (u+v<1)) {
     // The triangualr surface is the target
     // find the norm 
-    Vector3d n =t_0.cross(t_1);
+    Vector3d n;
+    n.cross(t_1,t_0,n); // can precalculate this one
     //beore we normalize, we can find the distance...
-    *dist = (n.dot(m_pc));
+    *dist = (n.dot(m_pc)); 
     n.normalize();
     for (i = 0; i < 3; i++)
       *dist += ppos[i] * n[i];
     for (i = 0; i < 3; i++)
       vec[i] = n[i] * (*dist);
     return 0;
-  } elseif ((u>=0) && (v>=0)) {
+  } else if ((u>=0) && (v>=0)) {
   // the edge  AB is the target
-    Point a,b;
-    for (i = 0; i < 3; i++)
-      a[i] = m_pc[i] +m_va[i];
-      b[i] = m_pc[i] +m_vb[i];
-    s_ab = Segment(a,b);
+    Vector3d a;
+    Vector3d b;
+    for (i = 0; i < 3; i++) {
+      a[i] = m_pc[i] + m_va[i];
+      b[i] = m_pc[i] + m_vb[i];
+    }
+    Segment s_ab = Segment(a,b);
     s_ab.calculate_dist(ppos,dist,vec);
     return 0;
-  } elseif ((u<=0) && (v>=0)) {
+  } else if ((u<=0) && (v>=0)) {
   // the edge  CB is the target
-    Point b;
+    Vector3d b;
     for (i = 0; i < 3; i++)
       b[i] = m_pc[i] +m_vb[i];
-    s_cb = Segment(m_pc,b);
+    Segment s_cb = Segment(m_pc,b);
     s_cb.calculate_dist(ppos,dist,vec);
     return 0;
-  } elseif ((v<=0) ) {
+  } else if ((v<=0) ) {
   // the edge  AC is the target
-    Point a;
+    Vector3d a;
     for (i = 0; i < 3; i++)
-      a[i] = m_pc[i] +m_vb[i];
-    s_ac = Segment(m_pc,a);
+      a[i] = m_pc[i] +m_va[i];
+    Segment s_ac = Segment(a, m_pc);
     s_ac.calculate_dist(ppos,dist,vec);
     return 0;
   } else {
@@ -170,73 +174,6 @@ int Triangle2::calculate_dist(const double *ppos, double *dist, double *vec) con
   }
 }
 
-
-int Triangle::calculate_dist(const double *ppos, double *dist, double *vec) const {
-  int i;
-  // testing this method: http://blackpawn.com/texts/pointinpoly/
-  double t_0[3];
-  double t_1[3];
-  double t_2[3];
-  double dot00=0;
-  double dot01=0;
-  double dot02=0;
-  double dot11=0;
-  double dot12=0;
-  double u,v;
-  double a[3];
-
-// get some temp vectors
-  for (i = 0; i < 3; i++) {
-    t_0[i] = m_pc.va()[i] - m_pa.va()[i];
-    t_1[i] = m_pb.va()[i] - m_pa.va()[i];
-    t_2[i] = ppos[i] - m_pa.va()[i];
-    dot00 += SQR(t_0[i]);
-    dot01 += t_0[i]*t_1[i];
-    dot02 += t_0[i]*t_2[i];
-    dot11 += SQR(t_1[i]);
-    dot12 += t_1[i]*t_2[i];
-  }
-  double norm=1./(dot00*dot11 - SQR(dot01));
-  u = (dot11*dot02 - dot01*dot12)*norm;
-  v = (dot00*dot12 - dot01*dot02)*norm;
-  if ((u>=0) && (v>=0) && (u+v<1)) {
-    // find the minimum distance to the surface
-    *dist = -m_d;
-    for (i = 0; i < 3; i++)
-      *dist += ppos[i] * m_n[i];
-    vec[0]=m_n[0];
-    vec[1]=m_n[1];
-    vec[2]=m_n[2];
-    return 0;
-  }
- 
-// I can do better, but let's worry about performance at some later time...
-   else {
-  // if outside the planar triangle, find the closest segment
-  double d_sa, d_sb, d_sc;
-  double v_sa[3], v_sb[3], v_sc[3];
-  m_sa.calculate_dist(ppos, &d_sa,v_sa);
-  m_sb.calculate_dist(ppos, &d_sb,v_sb);
-  m_sc.calculate_dist(ppos, &d_sc,v_sc);
-  
-    if (d_sa<=d_sb && d_sa<=d_sc) {
-      *dist=d_sa;
-      vec=v_sa;
-      return 0;
-    } else if (d_sb<=d_sa && d_sb<=d_sc ) {
-      *dist=d_sb;
-      vec=v_sb;
-      *dist=d_sb;
-      return 0;
-    } else if (d_sc<=d_sa && d_sc<=d_sb) {
-      *dist=d_sc;
-      vec=v_sc;
-     *dist=d_sc;
-      return 0;
-    } 
-  }
-  return 1;
-}
 
 
 int Wall::calculate_dist(const double *ppos, double *dist, double *vec) const {
@@ -262,7 +199,7 @@ int Wall::calculate_dist(const double *ppos, double *dist, double *vec) const {
   //p3.calculate_dist(ppos, &d, d_v);
 
     
-  Triangle2 t1 = Triangle2(p1,p2,p3);
+  Triangle t1 = Triangle(p1,p2,p3);
   t1.calculate_dist(ppos, &d, d_v);
   
   for (i = 0; i < 3; i++)

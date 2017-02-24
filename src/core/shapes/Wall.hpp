@@ -27,7 +27,7 @@
 
 namespace Shapes {
 
-class Point : public Shape {
+class Point : public Shape{
 public:
   Point() : m_va({0., 0., 0.}) {}
 
@@ -72,57 +72,40 @@ private:
 
 class Triangle : public Shape {
 public:
-//  Triangle() : m_pa( Point({0., 0., 0.})), m_pb(Point({0., 0., 0.})) { }
-  double n[3];
+  Triangle(Vector3d a, Vector3d b, Vector3d c) {
+    int i = 0;
+    // can pre-calculate some dot products here if needed...
+    for (i; i<3; i++) {
+      m_va[i] = a[i] - c[i];
+      m_vb[i] = b[i] - c[i];
+      m_pc[i] = c[i];
+    }
+  }
   Triangle(Point a, Point b, Point c) {
-  m_sa = Segment (a,b);
-  m_sb = Segment (b,c);
-  m_sc = Segment (c,a);
-  m_pa = a;
-  m_pb = b;
-  m_pc = c;
-    
-  // TODO: verify this works
-  // use the cross product ab and bc to find the normal vector
-  m_n = Vector3d( {((a[1]-b[1])*(b[2]-c[2])-(a[2]-b[2])*(b[1]-c[1])), ((a[2]-b[2])*(b[0]-c[0])-(a[0]-b[0])*(b[2]-c[2])), ((a[0]-b[0])*(b[1]-c[1])-(a[1]-b[1])*(b[0]-c[0]))} );
-  //beore we normalize, we can find the distance...
-  m_d = -(m_n[0]*a[0]+m_n[1]*a[1]+m_n[2]*a[2]);
-  m_n.normalize();
+    int i = 0;
+    // can pre-calculate some dot products here if needed...
+    for (i; i<3; i++) {
+      m_va[i] = a[i] - c[i];
+      m_vb[i] = b[i] - c[i];
+      m_pc[i] = c[i];
+    }
   }
 
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;
-
-  Segment const &sa() const { return m_sa; }
-  Segment const &sb() const { return m_sb; }
-  Segment const &sc() const { return m_sc; }
-
-  Point const &pa() const { return m_pa; }
-  Point const &pb() const { return m_pb; }
-  Point const &pc() const { return m_pc; }
-
-
+ 
 private:
-  /** three segments defining the triangle*/
-  Segment m_sa;
-  Segment m_sb;
-  Segment m_sc;
-
-  Point m_pa;
-  Point m_pb;
-  Point m_pc;
-
-  // normal vector and distance (like infinite planar wall)
-  Vector3d m_n;
-  double m_d;
-
+  /** two vectors defining the triangle ( C to A and C to B */
+  Vector3d m_va;
+  Vector3d m_vb;
+  /** position of the corner origin C*/
+  Vector3d m_pc;
 };
 
 
-class Triangle2 : public Shape {
+class Square : public Shape {
 public:
-//  Triangle2() : m_pa( Point({0., 0., 0.})), m_pb(Point({0., 0., 0.})) { }
-  Triangle2(Vector3d a, Vector3d b, Vector3d c) {  
+  Square(Vector3d a, Vector3d b, Vector3d c) {  
     int i = 0;
     for (i; i<3; i++) {
       m_va[i] = a[i] - c[i];
@@ -132,12 +115,12 @@ public:
   }
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;
-
  
 private:
-  /** two vectors defining the triangle ( C to A and C to B */
+  /** two vectors defining the square ( C to A and C to B */
   Vector3d m_va;
   Vector3d m_vb;
+  /** position of the corner origin C*/
   Vector3d m_pc;
 };
 
