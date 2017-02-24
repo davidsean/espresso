@@ -33,8 +33,7 @@ public:
 
   Point(Vector3d a) {
    m_va=a;
-   }
- 
+   } 
    // overload the index operator  
    const double& operator[] (const int index) {
     return m_va[index];
@@ -49,6 +48,7 @@ private:
 };
 
 
+
 class Segment : public Shape {
 public:
   Segment() : m_pa( Point({0., 0., 0.})), m_pb(Point({0., 0., 0.})) {}
@@ -57,7 +57,6 @@ public:
   m_pa=a;
   m_pb=b;
   }
-
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;
 
@@ -82,7 +81,7 @@ public:
   m_pa = a;
   m_pb = b;
   m_pc = c;
-  
+    
   // TODO: verify this works
   // use the cross product ab and bc to find the normal vector
   m_n = Vector3d( {((a[1]-b[1])*(b[2]-c[2])-(a[2]-b[2])*(b[1]-c[1])), ((a[2]-b[2])*(b[0]-c[0])-(a[0]-b[0])*(b[2]-c[2])), ((a[0]-b[0])*(b[1]-c[1])-(a[1]-b[1])*(b[0]-c[0]))} );
@@ -112,9 +111,33 @@ private:
   Point m_pa;
   Point m_pb;
   Point m_pc;
+
   // normal vector and distance (like infinite planar wall)
   Vector3d m_n;
   double m_d;
+
+};
+
+
+class Triangle2 : public Shape {
+public:
+//  Triangle2() : m_pa( Point({0., 0., 0.})), m_pb(Point({0., 0., 0.})) { }
+  Triangle2(Vector3d a, Vector3d b, Vector3d c) {  
+    int i = 0;
+    for (i; i<3; i++) {
+      m_va[i]=c[i]-a[i];
+      m_vb[i]=c[i]-b[i];
+    }
+    m_pc=c;
+  }
+  int calculate_dist(const double *ppos, double *dist,
+                     double *vec) const override;
+
+private:
+  /** two vectors defining the triangle ( C to A and C to B */
+  Vector3d m_va;
+  Vector3d m_vb;
+  Vector3d m_pc;
 
 };
 
