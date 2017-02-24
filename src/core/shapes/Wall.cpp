@@ -259,38 +259,81 @@ int Square::calculate_dist(const double *ppos, double *dist, double *vec) const 
 
 
 int Voxel::calculate_dist(const double *ppos, double *dist, double *vec) const {
-  int i,i_min;
+  int j,i,i_min;
   double dx,dy,dz;
   double dx2,dy2,dz2;
   
   double delta[3];
   double delta2[3];
-  
-  for i in range(3){
-    delta[i] = m_va[i]-ppos[i];
+ 
+  for (i=0; i<3; i++) {
+    delta[i] = ppos[i]-m_va[i];
     delta2[i] = SQR(delta[i]);
-
-  i_min=0;
-  for i in range(3){
-      if (delta[i]<delta[i_min])
+  }
+  //if any distances are negative, this eliminates 3 of the 6 faces
+  for (j=0; j<3; j++) {
+    if (delta[j]<=0){
+      //printf("first corner!\n");
+      //i_min determines which square of the 3 is active
+      i_min=0;
+      for (i=0; i<3; i++) {
+        if (delta2[i]<delta2[i_min])
           i_min=i;
+      }
+      //create the active Square
+      Vector3d a,b;
+      for (i=0; i<3; i++) {
+          a[i]=m_va[i];
+          b[i]=m_va[i];
+      }
+      // dont change the active component!
+      a[(i_min+1)%3]+=m_l;
+      b[(i_min+2)%3]+=m_l;
+      Square voxel_face = Square(a,b,m_va);
+      voxel_face.calculate_dist(ppos,dist,vec);
+      return 0;
+    }
   }
-
-  //if pt is inside the voxel
-  if (delta2<SQR((0.5*m_l))) {
-      // part is inside voxel
-      // the closest wall is
-      
-      m_va
+  
+  // two options remain: 1)outside the 3 other faces or 2) Inside the voxel.
+  // test outside first, as is it most probable
+  for (i=0; i<3; i++) {
+    delta[i]-=m_l;
+    delta2[i] = SQR(delta[i]);
   }
-
-      
+  // if any are positive, it is outside.
+  for (j=0; j<3; j++) {
+    if (delta[j]>=0) {
+      //printf("second corner!\n");
+      //i_min determines which square of the 3 is active
+      i_min=0;
+      for (i=0; i<3; i++) {
+        if (delta2[i]<delta2[i_min])
+          i_min=i;
+      }
+      //create the active Square
+      Vector3d a,b,c;
+      for (i=0; i<3; i++) {
+          a[i]=m_va[i]+m_l;
+          b[i]=a[i]; // don't need to add a second time!
+          c[i]=a[i]; // ditto
+      }
+      a[(i_min+1)%3]-=m_l;
+      b[(i_min+2)%3]-=m_l;
+      Square voxel_face = Square(a,b,c);
+      voxel_face.calculate_dist(ppos,dist,vec);
+      return 0;
+    }
   }
-    calculate_dist
-    return 0;
-
-  Square face = Square()
+  // if the control flow reached here, the particle is INSIDE the voxel.
+  // not sure what do do now except return a negative distance
+  // this will at least set the LB boundaries correctly.
+  // TODO do something better
+  //printf("Inside\n");
+  *dist=0.955;
+  return 0;
 }
+
 
 
 int Wall::calculate_dist(const double *ppos, double *dist, double *vec) const {
@@ -299,12 +342,12 @@ int Wall::calculate_dist(const double *ppos, double *dist, double *vec) const {
   double d=0;
 
   // create a Point at 1 0 0  
-  Point p1 = Point({2.00, 2.0, 0.0});
+  //Point p1 = Point({2.00, 2.0, 0.0});
   //p1.calculate_dist(ppos, &d, d_v);
   //printf("pt1 is %f %f %f \t d:%f\n", d_v[0], d_v[1], d_v[2], d);
   
   // create a Point at 10 0 0  
-  Point p2 = Point({8.0, 8.0, 0.0});
+  //Point p2 = Point({8.0, 8.0, 0.0});
   //p2.calculate_dist(ppos, &d, d_v);
   //printf("pt2 is %f %f %f \t d:%f\n", d_v[0], d_v[1], d_v[2], d);
  
@@ -312,16 +355,16 @@ int Wall::calculate_dist(const double *ppos, double *dist, double *vec) const {
   //s1.calculate_dist(ppos, &d, d_v);
   //printf("s1 is %f %f %f \t d:%f\n", d_v[0], d_v[1], d_v[2], d);
  
-  Point p3 = Point({2.0, 8.1, 0.0});
+  //Point p3 = Point({2.0, 8.1, 0.0});
   //p3.calculate_dist(ppos, &d, d_v);
-
     
-  Square S1 = Square(p1,p2,p3);
-  S1.calculate_dist(ppos, &d, d_v);
+  //Square S1 = Square(p1,p2,p3);
+  //S1.calculate_dist(ppos, dist, vec);
   
-  for (i = 0; i < 3; i++)
-    vec[i]=d_v[i];
-  *dist=d;
+  //Voxel v1= Voxel({4.0,4.0,0.01},3.0);
+  //v1.calculate_dist(ppos, dist, vec);
+  
+
 
 /*
    *dist = -m_d;

@@ -73,18 +73,18 @@ private:
 class Triangle : public Shape {
 public:
   Triangle(Vector3d a, Vector3d b, Vector3d c) {
-    int i = 0;
+    int i;
     // can pre-calculate some dot products here if needed...
-    for (i; i<3; i++) {
+    for (i=0; i<3; i++) {
       m_va[i] = a[i] - c[i];
       m_vb[i] = b[i] - c[i];
       m_pc[i] = c[i];
     }
   }
   Triangle(Point a, Point b, Point c) {
-    int i = 0;
+    int i;
     // can pre-calculate some dot products here if needed...
-    for (i; i<3; i++) {
+    for (i=0; i<3; i++) {
       m_va[i] = a[i] - c[i];
       m_vb[i] = b[i] - c[i];
       m_pc[i] = c[i];
@@ -106,18 +106,18 @@ private:
 class Square : public Shape {
 public:
   Square(Vector3d a, Vector3d b, Vector3d c) {  
-    int i = 0;
-    for (i; i<3; i++) {
+    int i;
+    for (i=0; i<3; i++) {
       m_va[i] = a[i] - c[i];
       m_vb[i] = b[i] - c[i];
       m_pc[i] = c[i];
     }
   }
   
-Square(Point a, Point b, Point c) {
-    int i = 0;
+  Square(Point a, Point b, Point c) {
+    int i;
     // can pre-calculate some dot products here if needed...
-    for (i; i<3; i++) {
+    for (i=0; i<3; i++) {
       m_va[i] = a[i] - c[i];
       m_vb[i] = b[i] - c[i];
       m_pc[i] = c[i];
@@ -139,9 +139,9 @@ private:
 
 class Voxel : public Shape {
 public:
-  Square(Vector3d a, float l) {  
+  Voxel(Vector3d a, float l) {  
       m_va=a;
-      m_l=l
+      m_l=l;
   }
 
   int calculate_dist(const double *ppos, double *dist,
@@ -149,7 +149,7 @@ public:
 private:
   /** position of the corner origin A*/
   Vector3d m_va;
-  /** voxel lattive length*/
+  /** voxel lattice length*/
   double m_l;
 };
 

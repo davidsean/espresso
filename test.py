@@ -62,6 +62,9 @@ c1=system.constraints.add(particle_type=0, penetrable=1, shape=floor)
 #  Point p1 = Point({5.0, 0.0, 0.0});
 
 energies = system.analysis.energy()
+
+
+#exit()
 #print('{}\n'.format(energies['non_bonded']))
 
 
@@ -82,7 +85,7 @@ def main():
 
 #exit()
 
-z=0.1
+z=0.00
 fp=open('phiTriangle.dat', 'w')
 for x in np.arange(0,system.box_l[0],0.1):
   for y in np.arange(0,system.box_l[1],0.1):
