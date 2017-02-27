@@ -43,6 +43,6 @@ class Stomatocyte(ScriptInterfaceHelper):
 class Wall(ScriptInterfaceHelper):
     _so_name = "Shapes::Wall"
 
-class Custom(ScriptInterfaceHelper):
-    _so_name = "Shapes::Costum"
+class Point(ScriptInterfaceHelper):
+    _so_name = "Shapes::Point"
 
