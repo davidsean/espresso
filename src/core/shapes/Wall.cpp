@@ -363,7 +363,10 @@ int Wall::calculate_dist(const double *ppos, double *dist, double *vec) const {
   
   //Voxel v1= Voxel({4.0,4.0,0.01},3.0);
   //v1.calculate_dist(ppos, dist, vec);
-  
+  // Hack the wall framework to add a voxel 2x2 at vector: d_v*d
+  Voxel v1= Voxel({m_n[0]*m_d, m_n[1]*m_d, m_n[2]*m_d},2.0);
+  v1.calculate_dist(ppos,dist,vec);
+  return 0;
 
 
 /*
