@@ -19,7 +19,9 @@ class Maze(ScriptInterfaceHelper):
 
 class Pore(ScriptInterfaceHelper):
     _so_name = "Shapes::Pore"
-
+    
+class Pore(ScriptInterfaceHelper):
+    _so_name = "Shapes::Point"
 
 class Rhomboid(ScriptInterfaceHelper):
     _so_name = "Shapes::Rhomboid"

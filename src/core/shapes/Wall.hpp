@@ -24,34 +24,9 @@
 
 #include "Shape.hpp"
 #include "Vector.hpp"
+#include "Point.hpp"
 
 namespace Shapes {
-
-class Point : public Shape{
-public:
-  Point() : m_va({0., 0., 0.}) {}
-
-  Point(Vector3d a) {
-   m_va=a;
-   } 
-   // overload the index operator  
-   const double& operator[] (const int index) {
-    return m_va[index];
-  }
-  void set_pos(const Vector3d &pos) {
-   int i;
-   for (i=0; i<3;i++)
-     m_va[i]=pos[i]
-  }
-
-  int calculate_dist(const double *ppos, double *dist,
-                     double *vec) const override;                   
-  Vector3d const &va() const { return m_va; }
-private:
-  /** vector defining the point*/
-  Vector3d m_va;
-};
-
 
 
 class Segment : public Shape {

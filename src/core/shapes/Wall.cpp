@@ -23,18 +23,6 @@
 
 namespace Shapes {
 
-int Point::calculate_dist(const double *ppos, double *dist, double *vec) const {
-  int i;
-//find the distance to the Point 
-  *dist=0;
-  for (i = 0; i < 3; i++) {
-    vec[i] = ppos[i] - m_va[i];
-    *dist+= SQR(vec[i]);
-  }
-  *dist=sqrt(*dist);
-  return 0;
-}
-
 int Segment::calculate_dist(const double *ppos, double *dist, double *vec) const {
   int i;
   double d_a, d_b, d_ba, dot;

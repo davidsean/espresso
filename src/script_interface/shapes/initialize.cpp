@@ -27,6 +27,7 @@
 #include "Maze.hpp"
 #include "HollowCone.hpp"
 #include "Pore.hpp"
+#include "Point.hpp"
 #include "Rhomboid.hpp"
 #include "Slitpore.hpp"
 #include "Stomatocyte.hpp"
@@ -36,6 +37,7 @@ namespace Shapes {
 void initialize() {
   ScriptInterface::register_new<ScriptInterface::Shapes::NoWhere>(
       "Shapes::NoWhere");
+  ScriptInterface::register_new<ScriptInterface::Shapes::Point>("Shapes::Point");
   ScriptInterface::register_new<ScriptInterface::Shapes::Wall>("Shapes::Wall");
   ScriptInterface::register_new<ScriptInterface::Shapes::Sphere>(
       "Shapes::Sphere");
