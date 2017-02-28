@@ -38,7 +38,7 @@ public:
    const double& operator[] (const int index) {
     return m_va[index];
   }
-  
+
   void set_pos(const Vector3d &pos) {
      m_va = pos;
   }

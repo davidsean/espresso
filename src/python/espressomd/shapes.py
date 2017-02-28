@@ -20,8 +20,6 @@ class Maze(ScriptInterfaceHelper):
 class Pore(ScriptInterfaceHelper):
     _so_name = "Shapes::Pore"
     
-class Pore(ScriptInterfaceHelper):
-    _so_name = "Shapes::Point"
 
 class Rhomboid(ScriptInterfaceHelper):
     _so_name = "Shapes::Rhomboid"
@@ -44,3 +42,13 @@ class Stomatocyte(ScriptInterfaceHelper):
 
 class Wall(ScriptInterfaceHelper):
     _so_name = "Shapes::Wall"
+
+class Triangle(ScriptInterfaceHelper):
+    _so_name = "Shapes::Triangle"
+
+class Triangle(ScriptInterfaceHelper):
+    _so_name = "Shapes::Segment"
+    
+class Triangle(ScriptInterfaceHelper):
+    _so_name = "Shapes::Point" 
+

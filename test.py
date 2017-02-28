@@ -45,11 +45,11 @@ visualizer = openGLLive(system,
         background_color = [1.0,1.0,1.0], 
         )
 
-system.box_l =[100,100,100]
+system.box_l =[10,10,10]
 system.time_step = 0.01
 system.thermostat.set_langevin(kT=0.0, gamma=1.0)
 
-system.non_bonded_inter[0, 0].lennard_jones.set_params(
+system.non_bonded_inter[1, 0].lennard_jones.set_params(
      epsilon=1, sigma=1,
      cutoff=2**(1. / 6), shift="auto")
 
@@ -62,56 +62,46 @@ system.bonded_inter.add(fene)
 #system.part.add(id=0, pos=[box_l/2.0,box_l/2.0,box_l/2.0], fix=[1,1,1])
 #system.part.add(id=0, pos=[2,1,1],type=0, ext_force=[0,0,0])
 
+zero=0.01
+#tri=shapes.Triangle(a=[0.1,0.1,0.1], b=[0.1,9.9,0.1], c=[9.9,0.1,0.1])
+
+p1=shapes.Triangle(pos=[9,1.1,1.1])
+p2=shapes.Triangle(pos=[1.1,1.1,1.1])
+p3=shapes.Triangle(pos=[1.1,.9,1.1])
+p3=shapes.Triangle(pos=[5,5,1.1])
+
+#tri=shapes.Triangle(a=[9.9,0.1,0.1],b=[0.1,0.1,0.1], c=[0.1,9.9,0.1])
+#system.constraints.add(particle_type=1, penetrable=1, shape=tri)
+system.constraints.add(particle_type=1, penetrable=1, shape=p1)
+system.constraints.add(particle_type=1, penetrable=1, shape=p2)
+system.constraints.add(particle_type=1, penetrable=1, shape=p3)
 
 
-## ut a pillar of voxels
 
-for layer in range(10):
-  corner=np.array([0,0,0])+np.array([0,layer,0])
-  dist= ( np.sqrt(np.sum((corner**2))) )
-  print("floor=shapes.Wall(normal=[{},{},{}], dist={})".format(corner[0], corner[1], corner[2],dist))
-  print("system.constraints.add(particle_type=0, penetrable=1, shape=floor)")
 
-for y in np.arange(0.,9.,1.0):
-  vec="[%f, %f, %f]" %(0,y,0)
-  floor=shapes.Wall(normal=[0,y,0], dist=0.0)
-#  system.constraints.add(particle_type=0, penetrable=1, shape=floor)
+def main():
 
-exit()
+    while True: 
+        system.integrator.run(1)
+        #Update particle information safely here
+        visualizer.update()
 
-floor=shapes.Wall(normal=[0,0,2], dist=0.0)
-system.constraints.add(particle_type=0, penetrable=1, shape=floor)
-floor=shapes.Wall(normal=[0,1,2], dist=1.0)
-system.constraints.add(particle_type=0, penetrable=1, shape=floor)
-floor=shapes.Wall(normal=[0,2,2], dist=2.0)
-system.constraints.add(particle_type=0, penetrable=1, shape=floor)
-floor=shapes.Wall(normal=[0,3,2], dist=3.0)
-system.constraints.add(particle_type=0, penetrable=1, shape=floor)
-floor=shapes.Wall(normal=[0,4,2], dist=4.0)
-system.constraints.add(particle_type=0, penetrable=1, shape=floor)
-floor=shapes.Wall(normal=[0,5,2], dist=5.0)
-system.constraints.add(particle_type=0, penetrable=1, shape=floor)
-floor=shapes.Wall(normal=[0,6,2], dist=6.0)
-system.constraints.add(particle_type=0, penetrable=1, shape=floor)
-floor=shapes.Wall(normal=[0,7,2], dist=7.0)
-system.constraints.add(particle_type=0, penetrable=1, shape=floor)
-floor=shapes.Wall(normal=[0,8,2], dist=8.0)
-system.constraints.add(particle_type=0, penetrable=1, shape=floor)
-floor=shapes.Wall(normal=[0,9,2], dist=9.0)
-system.constraints.add(particle_type=0, penetrable=1, shape=floor)
+##Start simulation in seperate thread
+#t = Thread(target=main)
+#t.daemon = True
+#t.start()
 
-bond_length=0.97
-n_poly=20
-x=5
-y=5.5
-z=0.01
-for p in range(n_poly):
-  system.part.add(id=p, pos=[x,y,z], type=0, ext_force=[-0.1,0,0])
-  z+=bond_length
-for p in range(n_poly-1):
-  system.part[p].add_bond((fene,p+1))
-for p in system.part:
-  p.pos[2]-=12.0
+
+p=0
+z=8.0
+for x in np.arange(0,system.box_l[0],.5):
+  for y in np.arange(0,system.box_l[1],.5):
+    system.part.add(id=p, pos=[x,y,z], type=0, ext_force=[0,0,-0.2])
+    p+=1
+
+#visualizer.update()
+#visualizer.start()
+    
 
 sim_ID="test"
 vtf_file=open("{}.vtf".format(sim_ID),"w")
@@ -145,20 +135,6 @@ exit()
 #print('{}\n'.format(energies['non_bonded']))
 
 
-def main():
-
-    while True: 
-        system.integrator.run(1)
-        #Update particle information safely here
-        visualizer.update()
-
-#Start simulation in seperate thread
-#t = Thread(target=main)
-#t.daemon = True
-#t.start()
-
-#visualizer.update()
-#visualizer.start()
 
 
 

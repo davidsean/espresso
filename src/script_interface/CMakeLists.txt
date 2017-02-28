@@ -9,7 +9,7 @@ set(EspressoScriptInterface_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/shapes/HollowCone.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/shapes/initialize.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/shapes/Maze.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/shapes/Point.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/shapes/Triangle.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/shapes/Pore.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/shapes/Rhomboid.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/shapes/Slitpore.cpp"

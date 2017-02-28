@@ -25,62 +25,11 @@
 #include "Shape.hpp"
 #include "Vector.hpp"
 #include "Point.hpp"
+#include "Segment.hpp"
+
 
 namespace Shapes {
 
-
-class Segment : public Shape {
-public:
-  Segment() : m_pa( Point({0., 0., 0.})), m_pb(Point({0., 0., 0.})) {}
-
-  Segment(Point a, Point b) {
-  m_pa=a;
-  m_pb=b;
-  }
-  int calculate_dist(const double *ppos, double *dist,
-                     double *vec) const override;
-
-  Point const &pa() const { return m_pa; }
-  Point const &pb() const { return m_pb; }
-
-private:
-  /** two points defining the segment*/
-  Point m_pa;
-  Point m_pb;
-};
-
-
-class Triangle : public Shape {
-public:
-  Triangle(Vector3d a, Vector3d b, Vector3d c) {
-    int i;
-    // can pre-calculate some dot products here if needed...
-    for (i=0; i<3; i++) {
-      m_va[i] = a[i] - c[i];
-      m_vb[i] = b[i] - c[i];
-      m_pc[i] = c[i];
-    }
-  }
-  Triangle(Point a, Point b, Point c) {
-    int i;
-    // can pre-calculate some dot products here if needed...
-    for (i=0; i<3; i++) {
-      m_va[i] = a[i] - c[i];
-      m_vb[i] = b[i] - c[i];
-      m_pc[i] = c[i];
-    }
-  }
-
-  int calculate_dist(const double *ppos, double *dist,
-                     double *vec) const override;
- 
-private:
-  /** two vectors defining the triangle ( C to A and C to B */
-  Vector3d m_va;
-  Vector3d m_vb;
-  /** position of the corner origin C*/
-  Vector3d m_pc;
-};
 
 
 class Square : public Shape {
@@ -148,6 +97,7 @@ public:
     m_n.normalize();
     printf("placed voxel: %f %f %f\n", m_n[0]*m_d, m_n[1]*m_d, m_n[2]*m_d);
   }
+
 
   Vector3d const &n() const { return m_n; }
 
