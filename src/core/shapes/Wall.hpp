@@ -38,6 +38,11 @@ public:
    const double& operator[] (const int index) {
     return m_va[index];
   }
+  void set_pos(const Vector3d &pos) {
+   int i;
+   for (i=0; i<3;i++)
+     m_va[i]=pos[i]
+  }
 
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;                   
