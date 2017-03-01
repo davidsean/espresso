@@ -24,6 +24,8 @@
 
 #include "Shape.hpp"
 #include "core/shapes/Triangle.hpp"
+#include "core/shapes/Segment.hpp"
+#include "core/shapes/Point.hpp"
 
 namespace ScriptInterface {
 namespace Shapes {
@@ -53,7 +55,7 @@ public:
   const std::string name() const override { return "Shapes::Segment"; }
 
   ParameterMap valid_parameters() const override;
-  VariantMap get_parameters() const override;
+  //VariantMap get_parameters() const override;
   void set_parameter(const std::string &name, const Variant &value) override;
 
   std::shared_ptr<::Shapes::Shape> shape() const override { return m_seg; }

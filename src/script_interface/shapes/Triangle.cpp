@@ -27,7 +27,7 @@ using std::string;
 namespace ScriptInterface {
 namespace Shapes {
 
-    
+
 ParameterMap Point::valid_parameters() const {
   return {{"pos", {ParameterType::DOUBLE_VECTOR, 3, true}}};
 }
@@ -51,13 +51,14 @@ ParameterMap Segment::valid_parameters() const {
           {"b", {ParameterType::DOUBLE_VECTOR, 3, true}}};
 }
 
-VariantMap Segment::get_parameters() const {
-  return {{"a", m_seg->pa()}, {"b", m_seg->pb()} };
-}
+//VariantMap Segment::get_parameters() const {
+//  return {{"a", m_seg->pa()},
+//          {"b", m_seg->pb()}};
+//}
+
 
 void Segment::set_parameter(const string &name,
                          const ScriptInterface::Variant &value) {
-
   if (name == "a") {
     /* Get the variant as vector, and explicitly construct a Vector3d
        from that. */

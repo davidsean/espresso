@@ -43,7 +43,6 @@ public:
     }
   }
 
-
   Triangle(Point a, Point b, Point c) {
     int i;
     // can pre-calculate some dot products here if needed...
@@ -61,7 +60,7 @@ public:
       m_va[i] = pos[i] - m_pc[i];
   }
 
-  // carful, this changes the direction vector, to set point B, C needs to be defined first
+  // careful, this changes the direction vector, to set point B, C needs to be defined first
   void set_vb(const Vector3d &pos) { 
     int i;  
     for (i=0; i<3; i++)
@@ -72,11 +71,14 @@ public:
   void set_pc(const Vector3d &pos) { 
     m_pc = pos;
   }
-
+  // a triangle is a corner+two direction vectors,
+  // it is stored this way to prevent calculating 
+  // the directions every time
+  // vector from corner, to pt A
   Vector3d const &va() const { return m_va; }
-  
+  // vector from corner, to pt B
   Vector3d const &vb() const { return m_vb; }
-  
+  // corner node, pt C
   Vector3d const &pc() const { return m_pc; }
 
 

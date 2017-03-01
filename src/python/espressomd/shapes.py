@@ -46,9 +46,9 @@ class Wall(ScriptInterfaceHelper):
 class Triangle(ScriptInterfaceHelper):
     _so_name = "Shapes::Triangle"
 
-class Triangle(ScriptInterfaceHelper):
+class Segment(ScriptInterfaceHelper):
     _so_name = "Shapes::Segment"
     
-class Triangle(ScriptInterfaceHelper):
+class Point(ScriptInterfaceHelper):
     _so_name = "Shapes::Point" 
 

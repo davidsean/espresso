@@ -62,21 +62,92 @@ system.bonded_inter.add(fene)
 #system.part.add(id=0, pos=[box_l/2.0,box_l/2.0,box_l/2.0], fix=[1,1,1])
 #system.part.add(id=0, pos=[2,1,1],type=0, ext_force=[0,0,0])
 
+
+# helper
+def draw_triangle(fp, a,  b,  c) :
+  fp.write("draw triangle \"{} {} {}\" \"{} {} {}\" \"{} {} {}\"\n".format(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]))
+
+
+def open_ASCII_STL(fp):
+  vertex=[]
+  for line in fp:
+    parsed=line.split()
+    if len(parsed)>1:
+      if (parsed[0]=="vertex"):
+        vertex.append(float(parsed[1]))
+        vertex.append(float(parsed[2]))
+        vertex.append(float(parsed[3]))
+  return np.array(vertex)
+    
+#  vertex 432.608 69.762 -218.242
+#  vertex 432.124 69.754 -217.288
+#  vertex 432.616 70.246 -217.288
+
+
 zero=0.01
-#tri=shapes.Triangle(a=[0.1,0.1,0.1], b=[0.1,9.9,0.1], c=[9.9,0.1,0.1])
-
-p1=shapes.Triangle(pos=[9,1.1,1.1])
-p2=shapes.Triangle(pos=[1.1,1.1,1.1])
-p3=shapes.Triangle(pos=[1.1,.9,1.1])
-p3=shapes.Triangle(pos=[5,5,1.1])
-
-#tri=shapes.Triangle(a=[9.9,0.1,0.1],b=[0.1,0.1,0.1], c=[0.1,9.9,0.1])
-#system.constraints.add(particle_type=1, penetrable=1, shape=tri)
-system.constraints.add(particle_type=1, penetrable=1, shape=p1)
-system.constraints.add(particle_type=1, penetrable=1, shape=p2)
-system.constraints.add(particle_type=1, penetrable=1, shape=p3)
+fp=open("test.con" , "w")
+fp.write("draw delete all\n")
+fp.write("draw color 3\n")
+fp.write("draw material Opaque\n")
 
 
+vert= open_ASCII_STL(open("cow_ASCII.stl","r"))
+vert = np.reshape(vert,(len(vert)/9,3,3))
+
+print (" Need to print {} triangles".format(len(vert[:,0,0])))
+# rescale?
+xmin=np.min(vert[:,:,0])
+ymin=np.min(vert[:,:,1])
+zmin=np.min(vert[:,:,2])
+
+vert[:,:,0]-=xmin
+vert[:,:,1]-=ymin
+vert[:,:,2]-=zmin
+
+
+xmax=np.max(vert[:,:,0])
+ymax=np.max(vert[:,:,1])
+zmax=np.max(vert[:,:,2])
+
+max= np.max([xmax, ymax, zmax])
+
+rescale=(system.box_l[0])*1./(max+2)
+vert*=rescale
+
+
+
+#for v in vert:
+#  draw_triangle(fp, v[0], v[1], v[2])
+
+
+p1=shapes.Point(pos=[8,1.1,1.1])
+p2=shapes.Point(pos=[1.1,1.1,1.1])
+p3=shapes.Point(pos=[5,5,1.1])
+#system.constraints.add(particle_type=1, penetrable=1, shape=p1)
+#system.constraints.add(particle_type=1, penetrable=1, shape=p2)
+#system.constraints.add(particle_type=1, penetrable=1, shape=p3)
+
+#s1=shapes.Segment(a=[5,5,1.1], b=[9,1.1,1.1])
+#system.constraints.add(particle_type=1, penetrable=1, shape=s1)
+
+#tri=shapes.Triangle(a=[8,1.1,1.1], b=[1.1,1.1,1.1], c=[5,5,1.1])
+#tri=shapes.Triangle(a=[1,1.1,1.1], b=[8.1,1.1,1.1], c=[5,5,1.1])
+a=[5,5,1.1]
+b=[8.1,1.1,1.1]
+c=[1.,1.1,1.1]
+
+for v in vert:
+  a=v[0]
+  b=v[1]
+  c=v[2]
+#  tri=shapes.Triangle(a=[v[0,0], v[0,1], v[0,2]], b=[v[1,0], v[1,1], v[1,2]], c=[v[2,0], v[2,1], v[2,2]])
+  tri=shapes.Triangle(a=[float(a[0]), float(a[1]), float(a[2])], b=[float(b[0]), float(b[1]), float(b[2])], c=[float(c[0]), float(c[1]), float(c[2])])
+  system.constraints.add(particle_type=1, penetrable=1, shape=tri)
+  draw_triangle(fp, v[0], v[1], v[2])
+
+#draw_triangle(fp, a, b, c)
+
+fp.close()
 
 
 def main():
@@ -94,9 +165,9 @@ def main():
 
 p=0
 z=8.0
-for x in np.arange(0,system.box_l[0],.5):
-  for y in np.arange(0,system.box_l[1],.5):
-    system.part.add(id=p, pos=[x,y,z], type=0, ext_force=[0,0,-0.2])
+for x in np.arange(0,system.box_l[0],1):
+  for y in np.arange(0,system.box_l[1],1):
+    system.part.add(id=p, pos=[x,y,z], type=0, ext_force=[0,0,-.5])
     p+=1
 
 #visualizer.update()
@@ -118,17 +189,11 @@ vtf_file.write("\ntimestep ordered\n")
 for p in system.part:
   vtf_file.write("{} {} {} \n".format(p.pos[0], p.pos[1], p.pos[2]))    
 
-for t in range(1000):
+for t in range(500):
   system.integrator.run(10)
   vtf_file.write("\ntimestep ordered\n")
   for p in system.part:
     vtf_file.write("{} {} {} \n".format(p.pos[0], p.pos[1], p.pos[2]))    
-
-
-#  Point p1 = Point({1.0, 0.0, 0.0});
-#  Point p1 = Point({5.0, 0.0, 0.0});
-
-energies = system.analysis.energy()
 
 
 exit()

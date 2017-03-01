@@ -46,11 +46,19 @@ int Triangle::calculate_dist(const double *ppos, double *dist, double *vec) cons
     // find the norm 
     Vector3d n;
     n.cross(t_1,t_0,n); // can precalculate this one
-    //beore we normalize, we can find the distance...
-    *dist = (n.dot(m_pc)); 
-    n.normalize();
+    n.normalize(); // or this one
+    // Flip the normal... because... **shrugs**
+    n[0]*=-1.;
+    n[1]*=-1.;
+    n[2]*=-1.;
+
+    *dist = n.dot(m_pc); // can precalculate this one
+
+    //find the distance to the point
+    *dist=-1.*(*dist);
     for (i = 0; i < 3; i++)
       *dist += ppos[i] * n[i];
+      
     for (i = 0; i < 3; i++)
       vec[i] = n[i] * (*dist);
     return 0;
