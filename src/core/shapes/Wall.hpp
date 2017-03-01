@@ -24,68 +24,11 @@
 
 #include "Shape.hpp"
 #include "Vector.hpp"
-#include "Point.hpp"
-#include "Segment.hpp"
 
 
 namespace Shapes {
 
-
-
-class Square : public Shape {
-public:
-  Square(Vector3d a, Vector3d b, Vector3d c) {  
-    int i;
-    for (i=0; i<3; i++) {
-      m_va[i] = a[i] - c[i];
-      m_vb[i] = b[i] - c[i];
-      m_pc[i] = c[i];
-    }
-  }
-  
-  Square(Point a, Point b, Point c) {
-    int i;
-    // can pre-calculate some dot products here if needed...
-    for (i=0; i<3; i++) {
-      m_va[i] = a[i] - c[i];
-      m_vb[i] = b[i] - c[i];
-      m_pc[i] = c[i];
-    }
-  }
-
-  int calculate_dist(const double *ppos, double *dist,
-                     double *vec) const override;
- 
-private:
-  /** two vectors defining the square ( C to A and C to B */
-  Vector3d m_va;
-  Vector3d m_vb;
-  /** position of the corner origin C*/
-  Vector3d m_pc;
-};
-
-
-
-class Voxel : public Shape {
-public:
-  Voxel(Vector3d a, float l) {  
-      m_va=a;
-      m_l=l;
-  }
-
-  int calculate_dist(const double *ppos, double *dist,
-                     double *vec) const override; 
-private:
-  /** position of the corner origin A*/
-  Vector3d m_va;
-  /** voxel lattice length*/
-  double m_l;
-};
-
-
-
-//namespace Shapes {
-class Wall : public Shape {
+    class Wall : public Shape {
 public:
   Wall() : m_n({1., 0., 0.}), m_d(0.0) {}
 
