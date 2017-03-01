@@ -32,6 +32,8 @@ namespace Shapes {
 
 class Square : public Shape {
 public:
+  Square() : m_va({0., 0., 0.}), m_vb({0., 0., 0.}), m_pc({0., 0., 0.}) {}
+
   Square(Vector3d a, Vector3d b, Vector3d c) {  
     int i;
     for (i=0; i<3; i++) {
@@ -66,6 +68,8 @@ private:
 
 class Voxel : public Shape {
 public:
+  Voxel() : m_va({0., 0., 0.}), m_l(0.0) {}
+
   Voxel(Vector3d a, float l) {  
       m_va=a;
       m_l=l;
@@ -73,6 +77,18 @@ public:
 
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override; 
+  Vector3d const &va() const { return m_va; }
+  double const &l() const { return m_l; }
+
+  void set_l(const double &lattice) {
+    m_l = lattice;
+  }
+  
+  void set_va(const Vector3d &pos) {
+    m_va = pos;
+  }
+
+
 private:
   /** position of the corner origin A*/
   Vector3d m_va;

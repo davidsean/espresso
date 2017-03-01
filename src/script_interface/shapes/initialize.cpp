@@ -31,12 +31,16 @@
 #include "Slitpore.hpp"
 #include "Stomatocyte.hpp"
 #include "Triangle.hpp"
+#include "Voxel.hpp"
+
 
 namespace ScriptInterface {
 namespace Shapes {
 void initialize() {
   ScriptInterface::register_new<ScriptInterface::Shapes::NoWhere>(
       "Shapes::NoWhere");
+  ScriptInterface::register_new<ScriptInterface::Shapes::Square>("Shapes::Square");
+  ScriptInterface::register_new<ScriptInterface::Shapes::Voxel>("Shapes::Voxel");
   ScriptInterface::register_new<ScriptInterface::Shapes::Point>("Shapes::Point");
   ScriptInterface::register_new<ScriptInterface::Shapes::Segment>("Shapes::Segment");
   ScriptInterface::register_new<ScriptInterface::Shapes::Triangle>("Shapes::Triangle");

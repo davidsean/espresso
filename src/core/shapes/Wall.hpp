@@ -38,7 +38,6 @@ public:
   void set_normal(const Vector3d &normal) {
     m_n = normal;
     m_n.normalize();
-    printf("placed voxel: %f %f %f\n", m_n[0]*m_d, m_n[1]*m_d, m_n[2]*m_d);
   }
 
 

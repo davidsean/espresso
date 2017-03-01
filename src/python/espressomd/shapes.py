@@ -52,3 +52,9 @@ class Segment(ScriptInterfaceHelper):
 class Point(ScriptInterfaceHelper):
     _so_name = "Shapes::Point" 
 
+class Point(ScriptInterfaceHelper):
+    _so_name = "Shapes::Square" 
+
+class Point(ScriptInterfaceHelper):
+    _so_name = "Shapes::Voxel" 
+
