@@ -55,7 +55,33 @@ public:
 
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override;
+
+  // careful, this changes the direction vector, to set point A, C needs to be defined first
+  void set_va(const Vector3d &pos) {
+    int i;  
+    for (i=0; i<3; i++)
+      m_va[i] = pos[i] - m_pc[i];
+  }
+
+  // careful, this changes the direction vector, to set point B, C needs to be defined first
+  void set_vb(const Vector3d &pos) { 
+    int i;  
+    for (i=0; i<3; i++)
+      m_vb[i] = pos[i] - m_pc[i];
+  }
+
+
+  void set_pc(const Vector3d &pos) { 
+    m_pc = pos;
+  }
  
+ 
+  Vector3d const &va() const { return m_va; }
+ 
+  Vector3d const &vb() const { return m_vb; }
+ 
+  Vector3d const &pc() const { return m_pc; }
+
 private:
   /** two vectors defining the square ( C to A and C to B */
   Vector3d m_va;
@@ -77,8 +103,6 @@ public:
 
   int calculate_dist(const double *ppos, double *dist,
                      double *vec) const override; 
-  Vector3d const &va() const { return m_va; }
-  double const &l() const { return m_l; }
 
   void set_l(const double &lattice) {
     m_l = lattice;
@@ -88,6 +112,11 @@ public:
     m_va = pos;
   }
 
+  Vector3d const &va() const { return m_va; }
+
+  double const &l() const { return m_l; }
+
+  double &l() { return m_l; }
 
 private:
   /** position of the corner origin A*/
