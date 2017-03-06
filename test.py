@@ -130,8 +130,8 @@ fp.write("draw material Opaque\n")
 
 
 #vert= open_ASCII_STL(open("cow_ASCII.stl","r"))
-#vert= open_ASCII_STL(open("icosahedron_ASCII.stl","r"))
-vert= open_ASCII_STL(open("ESPResSo_ASCII.stl","r"))
+vert= open_ASCII_STL(open("icosahedron_ASCII.stl","r"))
+#vert= open_ASCII_STL(open("ESPResSo_ASCII.stl","r"))
 vert = np.reshape(vert,(len(vert)/9,3,3))
 
 print (" Need to print {} triangles".format(len(vert[:,0,0])))
@@ -166,7 +166,7 @@ vert[:,:,0]+=system.box_l[0]*0.5
 
 
 # shift x by 1
-#vert[:,:,0]+=1.0
+vert[:,:,0]+=1.0
 
 # shift z by 1
 vert[:,:,2]+=1.0
@@ -214,7 +214,10 @@ for c in system.constraints.get():
 fp.close()
 
 p=0
-z=8.0
+
+z=system.box_l[2]-18 #use 8 for ESPResSo
+#z=0.5*system.box_l[2] # for cow
+
 for x in np.arange(0,system.box_l[0],0.97):
   for y in np.arange(0,system.box_l[1],0.97):
     system.part.add(id=p, pos=[x,y,z], type=0, ext_force=[0,0,-.1])
@@ -248,7 +251,7 @@ for p in system.part:
 
 vtf_file.write("\ntimestep ordered\n")
 for p in system.part:
-  vtf_file.write("{} {} {} \n".format(p.pos[0], p.pos[1], p.pos[2]))    
+  vtf_file.write("{} {} {} \n".format(p.pos[0], p.pos[1], p.pos[2]))
 
 
 print("Simulating...")
@@ -257,7 +260,7 @@ for t in range(2000):
   system.integrator.run(10)
   vtf_file.write("\ntimestep ordered\n")
   for p in system.part:
-    vtf_file.write("{} {} {} \n".format(p.pos[0], p.pos[1], p.pos[2]))    
+    vtf_file.write("{} {} {} \n".format(p.pos[0], p.pos[1], p.pos[2]))
 
 
 
