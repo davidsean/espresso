@@ -39,7 +39,6 @@ class SpheroCylinder(ScriptInterfaceHelper):
 class Stomatocyte(ScriptInterfaceHelper):
     _so_name = "Shapes::Stomatocyte"
 
-
 class Wall(ScriptInterfaceHelper):
     _so_name = "Shapes::Wall"
 
@@ -52,9 +51,9 @@ class Segment(ScriptInterfaceHelper):
 class Point(ScriptInterfaceHelper):
     _so_name = "Shapes::Point" 
 
-class Point(ScriptInterfaceHelper):
+class Square(ScriptInterfaceHelper):
     _so_name = "Shapes::Square" 
 
-class Point(ScriptInterfaceHelper):
+class Voxel(ScriptInterfaceHelper):
     _so_name = "Shapes::Voxel" 
 
