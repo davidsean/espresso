@@ -249,6 +249,18 @@ class Triangle(ScriptInterfaceHelper):
     """
     An finite triangle: three segments and a triangular surface between them.
 
+    Attributes
+    ----------
+    a : vector
+       position of the first corner.
+
+    b : vector
+       vector pointing from the first to the second corner.
+
+    c : vector
+       vector pointing from the first to the third corner.
+    
+
     """    
 
     _so_name = "Shapes::Triangle"
@@ -257,6 +269,14 @@ class Triangle(ScriptInterfaceHelper):
 class Segment(ScriptInterfaceHelper):
     """
     An finite line segment: two points and a line between them.
+
+    Attributes
+    ----------
+    a : vector
+       position of the first point.
+    b : vector
+       position of the second point.
+
 
     """    
 
@@ -269,6 +289,13 @@ class Point(ScriptInterfaceHelper):
     """
     A single point.
 
+
+    Attributes
+    ----------
+    pos : vector
+       position of the point.
+
+
     """    
 
     _so_name = "Shapes::Point" 
@@ -277,7 +304,20 @@ class Point(ScriptInterfaceHelper):
 @script_interface_register
 class Square(ScriptInterfaceHelper):
     """
-    An finite square: four segments and a square surface.
+    An finite square: four segments and a square surface. A Square is like a triangle with a reflection of itself.
+
+    Attributes
+    ----------
+    a : vector
+       position of the first corner.
+
+    b : vector
+       vector pointing from the first to the second corner.
+
+    c : vector
+       vector pointing from the first to the third corner.
+       
+    Note that the fourth coner is simply the vector sum a+b or a+c and does not need to be defined.
 
     """    
 
@@ -288,7 +328,13 @@ class Voxel(ScriptInterfaceHelper):
     """
     A voxel: six squares forming a cube.
 
-    """    
+    Attributes
+    ----------
+    pos : vector
+       Position of the center of the (unit) voxel.
+
+
+    """ 
 
     _so_name = "Shapes::Voxel" 
 
