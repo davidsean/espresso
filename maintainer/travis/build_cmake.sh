@@ -37,13 +37,13 @@ function cmd {
     eval $1
 }
 
-
 # handle environment variables
-[ -z "$insource" ] && insource="true"
+[ -z "$insource" ] && insource="false"
 [ -z "$srcdir" ] && srcdir=`pwd`
 [ -z "$cmake_params" ] && cmake_params=""
 [ -z "$with_fftw" ] && with_fftw="true"
 [ -z "$with_python_interface" ] && with_python_interface="true"
+[ -z "$with_coverage" ] && with_coverage="false"
 [ -z "$myconfig" ] && myconfig="default"
 [ -z "$check_procs" ] && check_procs=2
 [ -z "$make_check" ] && make_check="true"
@@ -56,7 +56,7 @@ fi
 
 outp insource srcdir builddir \
     cmake_params with_fftw \
-    with_python_interface myconfig check_procs
+    with_python_interface with_coverage myconfig check_procs
 
 # check indentation of python files
 pep8 --filename=*.pyx,*.pxd,*.py --select=E111 $srcdir/src/python/espressomd/
@@ -71,17 +71,23 @@ else
     echo ""
     exit $ec
 fi
+# enforce style rules
+grep 'class[^_].*[^\)]\s*:\s*$' $(find . -name '*.py*') && echo -e "\nOld-style classes found.\nPlease convert to new-style:\nclass C: => class C(object):\n" && exit 1
 
-if [ ! $insource ]; then
+if ! $insource; then
     if [ ! -d $builddir ]; then
         echo "Creating $builddir..."
         mkdir -p $builddir
     fi
 fi
 
-if [ ! $insource ]; then
+if ! $insource; then
     cd $builddir
 fi
+
+# load MPI module if necessary
+grep -q suse /etc/os-release && source /etc/profile.d/modules.sh && module load gnu-openmpi
+grep -q rhel /etc/os-release && source /etc/profile.d/modules.sh && module load mpi
 
 # CONFIGURE
 start "CONFIGURE"
@@ -96,6 +102,10 @@ if [ $with_python_interface = "true" ]; then
     cmake_params="-DWITH_PYTHON=ON $cmake_params"
 else
     cmake_params="-DWITH_PYTHON=OFF $cmake_params"
+fi
+
+if [ $with_coverage = "true" ]; then
+    cmake_params="-DWITH_COVERAGE=ON $cmake_params"
 fi
 
 MYCONFIG_DIR=$srcdir/maintainer/configs
@@ -117,21 +127,21 @@ end "CONFIGURE"
 # BUILD
 start "BUILD"
 
-cmd "make" || exit $?
+cmd "make -j2" || exit $?
 
 end "BUILD"
 
 if $make_check; then
     start "TEST"
 
-    cmd "make check_python $make_params"
+    cmd "make -j2 check_python $make_params"
     ec=$?
     if [ $ec != 0 ]; then	
         cmd "cat $srcdir/testsuite/python/Testing/Temporary/LastTest.log"
         exit $ec
     fi
 
-    cmd "make check_unit_tests $make_params"
+    cmd "make -j2 check_unit_tests $make_params"
     ec=$?
     if [ $ec != 0 ]; then	
         cmd "cat $srcdir/src/core/unit_tests/Testing/Temporary/LastTest.log"
@@ -139,4 +149,19 @@ if $make_check; then
     fi
 
     end "TEST"
+else
+    start "TEST"
+
+    cmd "mpiexec -n $check_procs ./pypresso $srcdir/testsuite/python/particle.py" || exit 1
+
+    end "TEST"
+fi
+
+if $with_coverage; then
+    cd $builddir
+    lcov --directory . --capture --output-file coverage.info # capture coverage info
+    lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter out system
+    lcov --list coverage.info #debug info
+    # Uploading report to CodeCov
+    bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
 fi

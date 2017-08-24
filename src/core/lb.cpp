@@ -411,6 +411,24 @@ int lb_lbfluid_set_couple_flag(int couple_flag) {
 }
 
 
+int lb_lbfluid_get_couple_flag(int * couple_flag) {
+  *couple_flag = LB_COUPLE_NULL;
+  if (lattice_switch & LATTICE_LB_GPU)
+  {
+#ifdef LB_GPU
+    *couple_flag = lbpar_gpu.lb_couple_switch;
+#endif
+  }
+  else
+  {
+#ifdef LB
+    *couple_flag = LB_COUPLE_TWO_POINT;
+#endif
+  }
+  return 0;
+}
+
+
 int lb_lbfluid_set_agrid(double p_agrid){
   if ( p_agrid <= 0)
     return -1;
@@ -764,7 +782,7 @@ int lb_lbfluid_print_vtk_velocity(char* filename, std::vector<int> bb1, std::vec
             bb_low = {0, 0, 0};
             if (lattice_switch & LATTICE_LB_GPU) {
 #ifdef LB_GPU
-            bb_high = {lbpar_gpu.dim_x-1, lbpar_gpu.dim_y-1, lbpar_gpu.dim_z-1};
+            bb_high = {static_cast<int>(lbpar_gpu.dim_x)-1, static_cast<int>(lbpar_gpu.dim_y)-1, static_cast<int>(lbpar_gpu.dim_z)-1};
 #endif // LB_GPU
             } else {
 #ifdef LB
@@ -1363,7 +1381,16 @@ int lb_lbnode_get_boundary(int* ind, int* p_boundary) {
 
 int lb_lbnode_get_pop(int* ind, double* p_pop) {
     if (lattice_switch & LATTICE_LB_GPU) {
-        fprintf(stderr, "Not implemented for GPU\n");
+#ifdef LB_GPU
+      float population[19];
+
+      // c is the LB_COMPONENT for SHANCHEN (not yet interfaced)
+      int c = 0;
+      lb_lbfluid_get_population( ind, population, c );
+
+      for (int i = 0; i < LBQ; ++i)
+        p_pop[i] = population[i];
+#endif // LB_GPU
     } else {
 #ifdef LB
         index_t index;
@@ -1457,7 +1484,16 @@ int lb_lbnode_set_pi_neq(int* ind, double* pi_neq) {
 
 int lb_lbnode_set_pop(int* ind, double* p_pop) {
     if (lattice_switch & LATTICE_LB_GPU) {
-        printf("Not implemented in the LB GPU code!\n");
+#ifdef LB_GPU
+      float population[19];
+
+      for (int i = 0; i < LBQ; ++i)
+        population[i] = p_pop[i];
+
+      // c is the LB_COMPONENT for SHANCHEN (not yet interfaced)
+      int c = 0;
+      lb_lbfluid_set_population( ind, population, c );
+#endif // LB_GPU
     } else {
 #ifdef LB
         index_t index;

@@ -2,6 +2,12 @@ file(GLOB EspressoCore_SRC
           "*.cpp"
           )
 
+if( WITH_COVERAGE )
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage")
+  link_libraries(gcov)
+endif()
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -23,13 +29,14 @@ add_custom_target(EspressoConfig DEPENDS config-features.hpp config-features.cpp
 add_dependencies(EspressoConfig myconfig)
 
 add_library(EspressoCore SHARED ${EspressoCore_SRC} config-features.cpp config-version.cpp)
-set_target_properties(EspressoCore PROPERTIES SOVERSION ${SOVERSION})
 install(TARGETS EspressoCore LIBRARY DESTINATION ${LIBDIR})
+set_target_properties(EspressoCore PROPERTIES SOVERSION ${SOVERSION})
 add_dependencies(EspressoCore EspressoConfig)
 
 target_link_libraries(EspressoCore ${LIBRARIES} Actor ObjectInFluid ImmersedBoundary Shapes Constraints EspressoUtils Correlators Observables)
 
 if(SCAFACOS)
+  include_directories(${SCAFACOS_INCLUDE_DIRS})
   target_link_libraries(EspressoCore Scafacos)
 endif(SCAFACOS)
 
@@ -45,6 +52,7 @@ if(CUDA)
 
   cuda_add_library(EspressoCuda SHARED ${EspressoCuda_SRC})
   install(TARGETS EspressoCuda DESTINATION ${LIBDIR})
+  set_target_properties(EspressoCuda PROPERTIES SOVERSION ${SOVERSION})
   add_dependencies(EspressoCuda EspressoConfig)
 
   set_target_properties(EspressoCuda PROPERTIES MACOSX_RPATH TRUE)
